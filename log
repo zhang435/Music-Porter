@@ -1,0 +1,14 @@
+xiami music
+    login into xiami
+    go to my songs
+    grab the song name and player name
+
+    go to spotify
+    find the music
+        if music not find
+            tell user about it
+        else:
+            add to the playlist
+
+    find the api for the add to playlist and download
+    

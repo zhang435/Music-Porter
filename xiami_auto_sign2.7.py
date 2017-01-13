@@ -38,54 +38,44 @@ class LoginXiami:
         else :
             print('Login successfully!')
 
-    def signIn(self):
+    def fetch(self):
         postdata = {}
         postdata = urllib.urlencode(postdata)
-        print('signing...')
-        #  changed this part
-        req = urllib2.Request(url='http://www.xiami.com/space/lib-song/page/1', data=postdata, headers=self.signin_header)
-        # my_req = str(req, encoding="utf-8")
-        #print type(req)
-        content_stream = urllib2.urlopen(req)
-
-        result = content_stream.read()
-        musictable = re.findall('(?<=<td class="song_name">).+?(?=</td>)' , result , re.DOTALL)
-        # print(musictable)
+        print('Going to Your favorite')
+        page = 1
         song_artist = []
-        for i in musictable:
+        while 1:
 
-            song_name   = re.search('(?<=<a title=").+?(?=" hre)' , i , re.DOTALL).group(0)
+            req = urllib2.Request(url='http://www.xiami.com/space/lib-song/page/'+str(page), data=postdata, headers=self.signin_header)
+            content_stream = urllib2.urlopen(req)
+            result = content_stream.read()
+            if "song_name" not in result or page == 5:
+                print("finished fetch all songs in Xiami")
+                for i in song_artist:
+                    a,b = i
+                    print(a)
+                    print(b)
+                    print()
+                break
+            print("Currently In page "+str(page))
+            musictable = re.findall('(?<=<td class="song_name">).+?(?=</td>)' , result , re.DOTALL)
 
-            artist_name = re.search('(?<=<a class="artist_name").+?(?=</a>)' , i , re.DOTALL).group(0)
-            artist_name = re.search('(?<=">).+' ,  artist_name , re.DOTALL).group(0)
-            song_artist.append([song_name,artist_name])
-        for i in song_artist:
-            a,b = i
-            print(a)
-            print(b)
-            print()
 
+            for i in musictable:
 
+                song_name   = re.search('(?<=<a title=").+?(?=" hre)' , i , re.DOTALL).group(0)
+                song_name = song_name.replace("&#039;","'")
 
+                artist_name = re.search('(?<=<a class="artist_name").+?(?=</a>)' , i , re.DOTALL).group(0)
+                artist_name = re.search('(?<=">).+' ,  artist_name , re.DOTALL).group(0)
+                artist_name = artist_name.replace("&#039;","'")
+                song_artist.append([song_name,artist_name])
+            page+=1
 
-        # print(result)
-        #
-        # #result = str(result).decode('utf-8').encode('gbk')
-        # self.cookie.save(self.cookieFile)
-        # try:
-        #     result = int(result)
-        # except ValueError:
-        #     print('signing failed...')
-        #     sys.exit()
-        # except:
-        #     print('signing failed due to unknown reasons ...')
-        #     sys.exit()
-        # print('signing successfully!')
-        # print(self.email,'have signed', result, 'days continuously...')
 
 
 
 if __name__ == '__main__':
     user = LoginXiami('apple19950105@gmail.com', 'apple19950105')
     user.login()
-    user.signIn()
+    user.fetch()
