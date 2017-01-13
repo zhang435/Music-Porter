@@ -4,7 +4,7 @@ Created on 2012-11-15
 
 @author:
 '''
-import urllib, urllib2, cookielib, sys,base64
+import urllib, urllib2, cookielib, sys,base64,re
 
 class LoginXiami:
     login_header = {'User-Agent':'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.79 Safari/537.4'}
@@ -43,26 +43,45 @@ class LoginXiami:
         postdata = urllib.urlencode(postdata)
         print('signing...')
         #  changed this part
-        req = urllib2.Request(url='http://www.xiami.com/space/lib-song', data=postdata, headers=self.signin_header)
+        req = urllib2.Request(url='http://www.xiami.com/space/lib-song/page/1', data=postdata, headers=self.signin_header)
         # my_req = str(req, encoding="utf-8")
         #print type(req)
         content_stream = urllib2.urlopen(req)
 
         result = content_stream.read()
-        print(result)
+        musictable = re.findall('(?<=<td class="song_name">).+?(?=</td>)' , result , re.DOTALL)
+        # print(musictable)
+        song_artist = []
+        for i in musictable:
 
-        #result = str(result).decode('utf-8').encode('gbk')
-        self.cookie.save(self.cookieFile)
-        try:
-            result = int(result)
-        except ValueError:
-            print('signing failed...')
-            sys.exit()
-        except:
-            print('signing failed due to unknown reasons ...')
-            sys.exit()
-        print('signing successfully!')
-        print(self.email,'have signed', result, 'days continuously...')
+            song_name   = re.search('(?<=<a title=").+?(?=" hre)' , i , re.DOTALL).group(0)
+
+            artist_name = re.search('(?<=<a class="artist_name").+?(?=</a>)' , i , re.DOTALL).group(0)
+            artist_name = re.search('(?<=">).+' ,  artist_name , re.DOTALL).group(0)
+            song_artist.append([song_name,artist_name])
+        for i in song_artist:
+            a,b = i
+            print(a)
+            print(b)
+            print()
+
+
+
+
+        # print(result)
+        #
+        # #result = str(result).decode('utf-8').encode('gbk')
+        # self.cookie.save(self.cookieFile)
+        # try:
+        #     result = int(result)
+        # except ValueError:
+        #     print('signing failed...')
+        #     sys.exit()
+        # except:
+        #     print('signing failed due to unknown reasons ...')
+        #     sys.exit()
+        # print('signing successfully!')
+        # print(self.email,'have signed', result, 'days continuously...')
 
 
 
