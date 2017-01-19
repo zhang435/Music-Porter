@@ -13,7 +13,7 @@ The music get from **Xiami -> my music 我的音乐 -> Spotify -> playlist -> Fr
 - [ ]password
 
 ####     Spotify:
-username (if your username if from facebook, or have space between, this app may not work for you, change ti to one word)
+- [ ] username (if your username if from facebook, or have space between, this app may not work for you, change ti to one word)
 - [ ] [Spotify Application Sign in with your spotify account](https://developer.spotify.com/my-applications/)
 - [ ] Create Application (name whatever you want, I personally recommand 'Xiami_connection' for example)
 - [ ] after you successfully create an application, you will see Client_id and Client_Secret, keep these two information
@@ -37,11 +37,11 @@ move.start()
 
 
 ## PROBLEM:
-    xiami is poplar used in Chinese market, it is not surprise that there are many some that user have is in chinese name
+xiami is poplar used in Chinese market, it is not surprise that there are many some that user have is in chinese name
 
-    > Spotify does not have that a few chinese song, but there most of them can be found "manually"
+> Spotify does not have that a few chinese song, but there most of them can be found "manually"
 
-    > I blame this problem on the developer who collect song resouces,
-        > for example it has name for both Simplifed Chinese and traditional Chinese. but if you search with only simplfied , you may not find the song even it is actully there, same for traditional chinese. AND, some chinese singer are named in english....which is impossibel to search correctly
+> I blame this problem on the developer who collect song resouces,
+    > for example it has name for both Simplifed Chinese and traditional Chinese. but if you search with only simplfied , you may not find the song even it is actully there, same for traditional chinese. AND, some chinese singer are named in english....which is impossibel to search correctly
 
-    > for me 900 are enable to pass 550, still need improve :)
+> for me 900 are enable to pass 550, still need improve :)
