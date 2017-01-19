@@ -1,0 +1,4 @@
+#LWP-Cookies-2.0
+Set-Cookie3: _unsign_token=8841a9ebc0407334d5904b111a3e8bf9; path="/"; domain=".xiami.com"; path_spec; domain_dot; expires="2018-01-18 21:00:00Z"; httponly=None; version=0
+Set-Cookie3: _xiamitoken=4dca7f9a7053e86d52b4673c6cfe34d5; path="/"; domain=".xiami.com"; path_spec; domain_dot; expires="2017-01-25 21:00:00Z"; version=0
+Set-Cookie3: gid=148480526951647; path="/"; domain=".xiami.com"; path_spec; domain_dot; expires="2020-01-19 05:54:29Z"; version=0

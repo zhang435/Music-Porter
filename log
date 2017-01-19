@@ -1,4 +1,11 @@
-enable to get uset playlist from Spotify, find the fcuntion to add music into the spotify 
+problem:
+    at this point, every function works, while the problem become
+    the resources in spotify, for some chinese singer have simply name
+    in spotify but some have tridional chinese in Spotify, some of them even have
+    english name on it and wtf....
+
+
+enable to get uset playlist from Spotify, find the fcuntion to add music into the spotify
 enable user to get their farviort from xiami 01/14
 
 
@@ -15,4 +22,3 @@ xiami music
             add to the playlist
 
     find the api for the add to playlist and download
-    

@@ -11,13 +11,8 @@ from utf8_trans import to_utf8, isEnglish
 # specially spend time to deal with tranfer chinese to to uncoide and
 # search , change the uncoide backinto chinese
 
-
-idd = '8e18b60279e24176b47fc07f62b79a58'
-sec = '77b157039d304a46926633481274985f'
-web = 'http://www.cnn.com/'
-
+scope = 'playlist-modify-public'
 sp = spotipy.Spotify()
-
 
 class Search_Singers_Song(object):
 
@@ -33,13 +28,20 @@ class Search_Singers_Song(object):
         items = results["tracks"]["items"]
 
         for item in items:
-            print(item['artists'][0]['name'].encode(
-                'utf8', 'ignore').lower(), self.singer.lower())
+            # print item['artists'][0]['name'].encode('utf8', 'ignore').lower(),
+            # print self.singer
             if item['artists'][0]['name'].encode('utf8', 'ignore').lower() == self.singer.lower():
-                return (item['uri'], item['id'])
-        return False
-# a = Search_Singers_Song("李代沫", "疼爱")
-# print(a.get_song_uri())
-b = Search_Singers_Song("katy perry", "teenage Dream")
-print(b.get_song_uri())
-# eror ketty perry will ot work since the singer is katy perry
+                return (True, item['artists'][0]['name'].encode('utf8', 'ignore').lower(), item['uri'], item['id'])
+        return [False, self.song, self.singer]
+# song = input('Song\n')
+# artist = input("Singer\n")
+if __name__ == '__main__':
+    song = '彩虹'
+    artist = '張惠妹'
+
+    print(artist == '張惠妹')
+    b = Search_Singers_Song(artist, song)
+    # print(b.get_song_uri()[0])
+    print(b.get_song_uri()[1])
+    # print(b.get_song_uri()[2])
+    # eror ketty perry will ot work since the singer is katy perry

@@ -1,5 +1,7 @@
-# this function enable user to search the song and artist name in chinese
-
+'''
+    this function enable user to search the song and artist name in chinese
+    this is enable chinese ben tranfer into hex so it will pass into API
+'''
 
 def to_utf8(text):
     if isinstance(text, unicode):
