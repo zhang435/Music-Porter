@@ -31,18 +31,17 @@ move.start()
 
 
 ## Reference:
-    [Spotify API](https://developer.spotify.com/web-api/)
-    [Spotipy Python Package](https://github.com/plamere/spotipy)
-    [spotipy Documentation](http://spotipy.readthedocs.io/en/latest/)
-    [urllib using](https://github.com/liyuntao/SignXiami)
+[Spotify API](https://developer.spotify.com/web-api/)
+[Spotipy Python Package](https://github.com/plamere/spotipy)
+[spotipy Documentation](http://spotipy.readthedocs.io/en/latest/)
+[urllib using](https://github.com/liyuntao/SignXiami)
 
 
 ## PROBLEM:
 xiami is poplar used in Chinese market, it is not surprise that there are many some that user have is in chinese name
 
-> Spotify does not have that a few chinese song, but there most of them can be found "manually"
+> Spotify does not have that a few Chinese song, but there most of them can be found "manually"
 
-> I blame this problem on the developer who collect song resouces,
-    > for example it has name for both Simplifed Chinese and traditional Chinese. but if you search with only simplfied , you may not find the song even it is actully there, same for traditional chinese. AND, some chinese singer are named in english....which is impossibel to search correctly
+> I blame this problem on the developer who collect song resouces, for example it has name for both Simplifed Chinese and traditional Chinese. but if you search with only simplfied , you may not find the song even it is actully there, same for traditional chinese. AND, some chinese singer are named in english....which is impossibel to search correctly
 
 > for me 900 are enable to pass 550, still need improve :)
