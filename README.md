@@ -7,23 +7,23 @@
 
 ## Step:
 ####     Xiami:
-        username
+- [ ]username
         password
 ####     Spotify:
-        username (if your username if from facebook, or have space between, this app may not work for you, change ti to one word)
-        - [ ] [Spotify Application Sign in with your spotify account](https://developer.spotify.com/my-applications/)
-        - [ ] Create Application (name whatever you want, I personally recommand 'Xiami_connection' for example)
-        - [ ] after you successfully create an application, you will see Client_id and Client_Secret, keep these two information
-        - [ ] You will also see Redirect URIs after it, in there Paste [](http://github.com/zhang435/Xiami_To_Spotify/) and click add
-        - [ ] In the code, there is
+username (if your username if from facebook, or have space between, this app may not work for you, change ti to one word)
+- [ ] [Spotify Application Sign in with your spotify account](https://developer.spotify.com/my-applications/)
+- [ ] Create Application (name whatever you want, I personally recommand 'Xiami_connection' for example)
+- [ ] after you successfully create an application, you will see Client_id and Client_Secret, keep these two information
+- [ ] You will also see Redirect URIs after it, in there Paste [](http://github.com/zhang435/Xiami_To_Spotify/) and click add
     Now download the [code](https://github.com/zhang435/Xiami_To_Spotify/archive/master.zip)
-    At the botton of main.py
-    replace information with you own
-    ```python
-    if __name__ == '__main__':
-        move = Xiami_to_Spotify('XIAMI_USERNAME','XIAMI_PASSWORD','SPOTIFY_USERNAME','CLIENT_ID','CLIENT_CECRET')
-        move.start()
-    ```
+At the botton of main.py
+replace information with you own
+- [ ] In the code, there is
+```python
+if __name__ == '__main__':
+move = Xiami_to_Spotify('XIAMI_USERNAME','XIAMI_PASSWORD','SPOTIFY_USERNAME','CLIENT_ID','CLIENT_CECRET')
+move.start()
+```
 
 
 ## Reference:
