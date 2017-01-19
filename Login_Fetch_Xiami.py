@@ -64,7 +64,7 @@ class LoginXiami:
 
             content_stream = urllib2.urlopen(req)
             result = content_stream.read()
-            if 'class="artist_name"' not in result or page == 15:
+            if 'class="artist_name"' not in result:
                 print('\x1b[1;32m'+'#' * 20 + '#' * 20)
                 print('#' * 20 + '#' * 20+"\x1b[1;0m")
 

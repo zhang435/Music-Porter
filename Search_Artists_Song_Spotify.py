@@ -33,15 +33,3 @@ class Search_Singers_Song(object):
             if item['artists'][0]['name'].encode('utf8', 'ignore').lower() == self.singer.lower():
                 return (True, item['artists'][0]['name'].encode('utf8', 'ignore').lower(), item['uri'], item['id'])
         return [False, self.song, self.singer]
-# song = input('Song\n')
-# artist = input("Singer\n")
-if __name__ == '__main__':
-    song = '彩虹'
-    artist = '張惠妹'
-
-    print(artist == '張惠妹')
-    b = Search_Singers_Song(artist, song)
-    # print(b.get_song_uri()[0])
-    print(b.get_song_uri()[1])
-    # print(b.get_song_uri()[2])
-    # eror ketty perry will ot work since the singer is katy perry

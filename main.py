@@ -4,43 +4,9 @@ import pprint
 import spotipy.util as util
 from Login_Fetch_Xiami import *
 from Search_Artists_Song_Spotify import *
-idd = '8e18b60279e24176b47fc07f62b79a58'
-sec = '77b157039d304a46926633481274985f'
 
 web  ='http://github.com/zhang435/Xiami_To_Spotify/'
-# web = 'http://www.cnn.com/'
 scope = 'user-library-read'
-
-# if token:
-#     sp = spotipy.Spotify(auth=token)
-#     #
-#     user = LoginXiami('apple19950105@gmail.com', 'apple19950105')
-#     user.login()
-#     songs = user.fetch_faviort()
-#     results = []
-#     error = []
-#     print("start add songs into Spotify default playlist")
-#     for song in songs:
-#         data = Search_Singers_Song(song[1], song[0])
-#         song = data.get_song_uri()
-#
-#         if song[0]:
-#             results.append(song[2])
-#         else:
-#             error.append(song)
-#
-# results = sp.user_playlist_add_tracks(
-#     username, '0Ng9cjSBSwtFhPAXmVpTqw', results)
-#
-# # results = sp.user_playlist_add_tracks(username, playlist_id, track_ids)
-# print("*" * 20)
-# print("complete")
-# print("*" * 20)
-# print '\n'
-# print("below's some are not avaliable in the market, or it using differnt name in Spotify")
-# for i in error:
-#     print i[1] + " : " + i[2]
-
 
 class Xiami_to_Spotify(object):
     def __init__(self,xiami_email,xiami_password,username,iD,sec, web = web):
@@ -131,5 +97,4 @@ class Xiami_to_Spotify(object):
 
 if __name__ == '__main__':
     # Xiami_to_Spotify('Xiami_Username','Xiami_password','Spotify_useranem',client_id,client_scert)
-    move = Xiami_to_Spotify('apple19950105@gmail.com','apple19950105','zhang435',idd,sec)
     move.start()
