@@ -2,8 +2,8 @@
 
 
 ## introduction:
-this is a project in purpose to enable user to transfer music from [Xiami](http://www.xiami.com) to [Spotify](https://www.spotify.com/us/)
-the music this application grading is from ** Xiami -> my music 我的音乐** to ** Spotify -> playlist -> From_Xiami (we create for you)**
+This is a project in purpose to enable user to transfer music from [Xiami](http://www.xiami.com) to [Spotify](https://www.spotify.com/us/).\n
+The music get from ** Xiami -> my music 我的音乐 -> Spotify -> playlist -> From_Xiami (we create for you)**
 
 ## Step:
 ####     Xiami:
