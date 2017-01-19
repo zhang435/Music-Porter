@@ -9,8 +9,8 @@ The music get from **Xiami -> my music 我的音乐 -> Spotify -> playlist -> Fr
 ## Step:
 
 ####    Xiami:
-- [ ]username
-- [ ]password
+- [ ] username (if your username if from facebook, or have space between, this app may not work for you, change ti to one word)
+- [ ] username (if your username if from facebook, or have space between, this app may not work for you, change ti to one word)
 
 ####     Spotify:
 - [ ] username (if your username if from facebook, or have space between, this app may not work for you, change ti to one word)
