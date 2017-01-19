@@ -6,21 +6,39 @@
     the music this application grading is from ** Xiami -> my music 我的音乐** to ** Spotify -> playlist -> From_Xiami (we create for you)**
 
 ## Step:
-    ### Xiami:
+####     Xiami:
         username
         password
-    ### Spotify
+####     Spotify:
         username (if your username if from facebook, or have space between, this app may not work for you, change ti to one word)
         - [ ] [Spotify Application Sign in with your spotify account](https://developer.spotify.com/my-applications/)
         - [ ] Create Application (name whatever you want, I personally recommand 'Xiami_connection' for example)
         - [ ] after you successfully create an application, you will see Client_id and Client_Secret, keep these two information
         - [ ] You will also see Redirect URIs after it, in there Paste [](http://github.com/zhang435/Xiami_To_Spotify/) and click add
-        - [ ] save！
-        
-have problem to move thousand music from Xiami to spotify, this is an application that in purpose to move all muic to spotify
+        - [ ] In the code, there is
+    Now download the [code](https://github.com/zhang435/Xiami_To_Spotify/archive/master.zip)
+    At the botton of main.py
+    replace information with you own
+    ```python
+    if __name__ == '__main__':
+        move = Xiami_to_Spotify('XIAMI_USERNAME','XIAMI_PASSWORD','SPOTIFY_USERNAME','CLIENT_ID','CLIENT_CECRET')
+        move.start()
+    ```
 
-get the login part from:
-https://github.com/liyuntao/SignXiami
-works great!
 
-at this point, able to grab all songs in the xiami for user
+## Reference:
+    [Spotify API](https://developer.spotify.com/web-api/)
+    [Spotipy Python Package](https://github.com/plamere/spotipy)
+    [spotipy Documentation](http://spotipy.readthedocs.io/en/latest/)
+    [urllib using](https://github.com/liyuntao/SignXiami)
+
+
+## PROBLEM:
+    xiami is poplar used in Chinese market, it is not surprise that there are many some that user have is in chinese name
+
+    > Spotify does not have that a few chinese song, but there most of them can be found "manually"
+
+    > I blame this problem on the developer who collect song resouces,
+        > for example it has name for both Simplifed Chinese and traditional Chinese. but if you search with only simplfied , you may not find the song even it is actully there, same for traditional chinese. AND, some chinese singer are named in english....which is impossibel to search correctly
+
+    > for me 900 are enable to pass 550, still need improve :)
