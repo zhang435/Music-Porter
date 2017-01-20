@@ -6,7 +6,7 @@ from Login_Fetch_Xiami import *
 from Search_Artists_Song_Spotify import *
 
 web  ='http://github.com/zhang435/Xiami_To_Spotify/'
-scope = 'user-library-read'
+scope = 'playlist-modify'
 
 class Xiami_to_Spotify(object):
     def __init__(self,xiami_email,xiami_password,username,iD,sec, web = web):
@@ -96,5 +96,5 @@ class Xiami_to_Spotify(object):
         print("\033[91m"+"*" * 30+"*" * 30+"\n"+"\033[0m")
 
 if __name__ == '__main__':
-    # Xiami_to_Spotify('Xiami_Username','Xiami_password','Spotify_useranem',client_id,client_scert)
+    #move = Xiami_to_Spotify('Xiami_Username','Xiami_password','Spotify_useranem',client_id,client_scert)
     move.start()

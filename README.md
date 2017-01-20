@@ -18,7 +18,8 @@ Knowing your
 - [ ] [Spotify Application Sign in with your spotify account](https://developer.spotify.com/my-applications/)
 - [ ] Create Application (name whatever you want, I personally recommand 'Xiami_connection' for example)
 - [ ] after you successfully create an application, you will see Client_id and Client_Secret, keep these two information
-- [ ] You will also see Redirect URIs after it, in there Paste [](http://github.com/zhang435/Xiami_To_Spotify/) and click add
+
+- [ ] You will also see Redirect URIs after it, in there Paste [http://github.com/zhang435/Xiami_To_Spotify/](http://github.com/zhang435/Xiami_To_Spotify/) and click add
     Now download the [code](https://github.com/zhang435/Xiami_To_Spotify/archive/master.zip)
 At the botton of main.py
 replace information with you own
