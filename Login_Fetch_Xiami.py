@@ -11,6 +11,7 @@ import sys
 import base64
 import re
 from utf8_trans import to_utf8
+import spotipy
 
 
 class LoginXiami:
@@ -90,9 +91,16 @@ class LoginXiami:
                 artist_name = re.search('(?<=<a class="artist_name").+?(?=</a>)', i, re.DOTALL).group(0)
                 artist_name = re.search('(?<=">).+',  artist_name, re.DOTALL).group(0)
                 artist_name = artist_name.replace("&#039;", "'")
-                print song_name,
-                print ' :', artist_name
-                song_artist.append([song_name, artist_name])
+                # improve the searching og both song name and artist name
+                if ' (Live)' in song_name:
+                    song_name = song_name.replace(" (Live)","")
+                sp = spotipy.Spotify()
+                result = sp.search(q='artist:' + to_utf8(artist_name), type='artist')
+                if  result['artists']['items']:
+                    artist_name = result['artists']['items'][0]['name']
+                print to_utf8(song_name),
+                print ' :', to_utf8(artist_name)
+                song_artist.append([to_utf8(song_name), to_utf8(artist_name)])
             page += 1
     def fetch_by_playlist(self):
         # http://www.xiami.com/space/collect/u/18313828

@@ -28,7 +28,6 @@ class Xiami_to_Spotify(object):
             sys.exit()
         sp = spotipy.Spotify(auth=self.token)
 
-        # user = LoginXiami('apple19950105@gmail.com', 'apple19950105')
         songs = user.fetch_faviort()
         songs , total  = songs[0],songs[1]
         results = []
@@ -48,18 +47,19 @@ class Xiami_to_Spotify(object):
 
         if tag:
             print("\x1b[1;32mCreate 'From_Xiami' in your playlist\x1b[0m")
+            print(self.username)
             sp.user_playlist_create(self.username, "From_Xiami")
             playlists = sp.user_playlists(self.username)
             for playlist in playlists['items']:
                 if "From_Xiami" == playlist['name']:
                     temp = playlist['id']
                     break
-            # print(playlist['id'], playlist['name'])
+        # print(playlist['id'], playlist['name'])
         # print(temp,songs)
         print("\x1b[1;32mStart add songs into Spotify default playlist\x1b[0m")
         count = 0
         for song in songs:
-                # sp = spotipy.Spotify(auth=self.token)
+            # sp = spotipy.Spotify(auth=self.token)
             count+=1
             sys.stdout.write("\r")
             sys.stdout.write("\x1b[1;36m... In process ..."+str(count)+"/"+str(total)+"\x1b[0m")
@@ -74,7 +74,7 @@ class Xiami_to_Spotify(object):
                 results.append(song[2])
             else:
                 error.append(song)
-            if count%10 == 0:
+            if count%99 == 0:
                 self.token = util.prompt_for_user_token(
                     client_id=self.iD, client_secret=self.sec, redirect_uri=self.web, username=self.username, scope=scope)
                 if results:
@@ -82,19 +82,20 @@ class Xiami_to_Spotify(object):
                     results = []
 
         print("\033[94m...Waiting...\033[0m")
-        results = sp.user_playlist_add_tracks(self.username, temp, results)
+        if results:
+            results = sp.user_playlist_add_tracks(self.username, temp, results)
         print('\x1b[6;20;43m Success!\x1b[0m')
 
 
         print("\033[91mbelow's some are not avaliable in the market, or it using differnt name in Spotify")
 
         print("*" * 30+"*" * 30+"\n")
-        print(str(len(error))+ "in total\033[0m")
+        print(str(len(error))+ " in total\033[0m")
         for i in error:
             print i[1] + " : " + i[2]
-        # results = sp.user_playlist_add_tracks(self.username, '0Ng9cjSBSwtFhPAXmVpTqw', results)
         print("\033[91m"+"*" * 30+"*" * 30+"\n"+"\033[0m")
+        print('\x1b[6;20;43m '+str(error+0.00001)/total+'% successfully added\x1b[0m')
 
 if __name__ == '__main__':
-    #move = Xiami_to_Spotify('Xiami_Username','Xiami_password','Spotify_useranem',client_id,client_scert)
+    move = Xiami_to_Spotify('Xiami_Username','Xiami_password','Spotify_useranem',client_id,client_scert)
     move.start()
