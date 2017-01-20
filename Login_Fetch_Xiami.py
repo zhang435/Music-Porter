@@ -64,7 +64,7 @@ class LoginXiami:
 
             content_stream = urllib2.urlopen(req)
             result = content_stream.read()
-            if 'class="artist_name"' not in result or page == 15:
+            if 'class="artist_name"' not in result or page == 7:
                 print('\x1b[1;32m'+'#' * 20 + '#' * 20)
                 print('#' * 20 + '#' * 20+"\x1b[1;0m")
 
@@ -90,8 +90,14 @@ class LoginXiami:
                 artist_name = re.search('(?<=<a class="artist_name").+?(?=</a>)', i, re.DOTALL).group(0)
                 artist_name = re.search('(?<=">).+',  artist_name, re.DOTALL).group(0)
                 artist_name = artist_name.replace("&#039;", "'")
+                if ' (Live)' in song_name:
+                    song_name = song_name.replace(" (Live)","")
+                result = sp.search(q='artist:' + to_utf8('Stefanie Sun'), type='artist')
+                if  result:
+                    artist_name = result['artists']['items'][0]['name']
                 print song_name,
                 print ' :', artist_name
+
                 song_artist.append([song_name, artist_name])
             page += 1
     def fetch_by_playlist(self):

@@ -9,7 +9,7 @@ sec = '77b157039d304a46926633481274985f'
 
 web  ='http://github.com/zhang435/Xiami_To_Spotify/'
 # web = 'http://www.cnn.com/'
-scope = 'user-library-read'
+scope = 'playlist-modify'
 
 # if token:
 #     sp = spotipy.Spotify(auth=token)
@@ -62,7 +62,7 @@ class Xiami_to_Spotify(object):
             sys.exit()
         sp = spotipy.Spotify(auth=self.token)
 
-        # user = LoginXiami('apple19950105@gmail.com', 'apple19950105')
+        user = LoginXiami('apple19950105@gmail.com', 'apple19950105')
         songs = user.fetch_faviort()
         songs , total  = songs[0],songs[1]
         results = []
@@ -85,7 +85,7 @@ class Xiami_to_Spotify(object):
             sp.user_playlist_create(self.username, "From_Xiami")
             playlists = sp.user_playlists(self.username)
             for playlist in playlists['items']:
-                if "From_Xiami" == playlist['name']:
+                if "test" == playlist['name']:
                     temp = playlist['id']
                     break
             # print(playlist['id'], playlist['name'])
