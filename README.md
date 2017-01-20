@@ -18,13 +18,13 @@ Knowing your
 
 
 - [ ] [Spotify Application Sign in with your spotify account](https://developer.spotify.com/my-applications/)
-![image](https://github.com/zhang435/Xiami_To_Spotify/blob/master/images/cretae_an_app.png)
+    ![image](https://github.com/zhang435/Xiami_To_Spotify/blob/master/images/cretae_an_app.png)
 - [ ] Create Application (name whatever you want, I personally recommand 'Xiami_connection' for example)
-![image](https://github.com/zhang435/Xiami_To_Spotify/blob/master/images/create_an_app_Detail.png)
+    ![image](https://github.com/zhang435/Xiami_To_Spotify/blob/master/images/create_an_app_Detail.png)
 - [ ] after you successfully create an application, you will see Client_id and Client_Secret, keep these two information, `Us your owns`
-![image](https://github.com/zhang435/Xiami_To_Spotify/blob/master/images/app_page.png)
-![image](https://github.com/zhang435/Xiami_To_Spotify/blob/master/images/get_id_sec.png)
-- [ ] You will also see Redirect URIs after it, in there Past [http://github.com/zhang435/Xiami_To_Spotify/](http://github.com/zhang435/Xiami_To_Spotify/) and click add and save
+    ![image](https://github.com/zhang435/Xiami_To_Spotify/blob/master/images/app_page.png)
+    ![image](https://github.com/zhang435/Xiami_To_Spotify/blob/master/images/get_id_sec.png)
+- [ ] You will also see Redirect URIs after it, paste [http://github.com/zhang435/Xiami_To_Spotify/](http://github.com/zhang435/Xiami_To_Spotify/) and click add and save
 - [ ]Now download the [code](https://github.com/zhang435/Xiami_To_Spotify/archive/master.zip).
 - [ ] At the bottom at main.py, replace information with you own information.
 ```python
@@ -37,7 +37,7 @@ move.start()
 `pip install request`
 `pip install spotipy`
 
-- [ ] Finally,in terminal run `python main.py`
+- [ ] Finally, in terminal run `python main.py`
 
 
 ## Reference:
