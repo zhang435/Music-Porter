@@ -23,10 +23,9 @@ Knowing your
 ![image](https://github.com/zhang435/Xiami_To_Spotify/blob/master/images/create_an_app_Detail.png)
 - [ ] after you successfully create an application, you will see Client_id and Client_Secret, keep these two information, `Us your owns`
 ![image](https://github.com/zhang435/Xiami_To_Spotify/blob/master/images/app_page.png)
-https://github.com/zhang435/Xiami_To_Spotify/blob/master/images/get_id_sec.png
-- [ ] You will also see Redirect URIs after it, in there Past [http://github.com/zhang435/Xiami_To_Spotify/](http://github.com/zhang435/Xiami_To_Spotify/) and click add
-    Now download the [code](https://github.com/zhang435/Xiami_To_Spotify/archive/master.zip). remember click save at the button!
-
+![image](https://github.com/zhang435/Xiami_To_Spotify/blob/master/images/get_id_sec.png)
+- [ ] You will also see Redirect URIs after it, in there Past [http://github.com/zhang435/Xiami_To_Spotify/](http://github.com/zhang435/Xiami_To_Spotify/) and click add and save
+- [ ]Now download the [code](https://github.com/zhang435/Xiami_To_Spotify/archive/master.zip).
 - [ ] At the bottom at main.py, replace information with you own information.
 ```python
 if __name__ == '__main__':
@@ -34,11 +33,11 @@ move = Xiami_to_Spotify('XIAMI_USERNAME','XIAMI_PASSWORD','SPOTIFY_USERNAME','CL
 move.start()
 ```
 - [ ] go to terminal (if you use window,make sure you install python2 first [install](http://stackoverflow.com/questions/21372637/installing-python-2-7-on-windows-8), while if you are mac user, lucky you , python2 come with mac)
-- [ ] in terminal(in window, it is command line?)return
+- [ ] in terminal(in window, it is command line?)run
 `pip install request`
 `pip install spotipy`
 
-- [ ] in terminal run `python main.py`
+- [ ] Finally,in terminal run `python main.py`
 
 
 ## Reference:
