@@ -16,13 +16,15 @@ Knowing your
 ####     Spotify:
 - [ ] username (if your username if from facebook, or have space between, this app may not work for you, change it to one word)
 
-![image](https://drive.google.com/open?id=0B1ClAnzq00KsQzNESlgxcGhMRDA)
-- [ ] [Spotify Application Sign in with your spotify account](https://developer.spotify.com/my-applications/)
-![Alt text](/relative/path/to/img.jpg?raw=true "Optional Title")
-- [ ] Create Application (name whatever you want, I personally recommand 'Xiami_connection' for example)
-- [ ] after you successfully create an application, you will see Client_id and Client_Secret, keep these two information
 
-- [ ] You will also see Redirect URIs after it, in there Paste [http://github.com/zhang435/Xiami_To_Spotify/](http://github.com/zhang435/Xiami_To_Spotify/) and click add
+- [ ] [Spotify Application Sign in with your spotify account](https://developer.spotify.com/my-applications/)
+![image](https://github.com/zhang435/Xiami_To_Spotify/blob/master/images/cretae_an_app.png)
+- [ ] Create Application (name whatever you want, I personally recommand 'Xiami_connection' for example)
+![image](https://github.com/zhang435/Xiami_To_Spotify/blob/master/images/create_an_app_Detail.png)
+- [ ] after you successfully create an application, you will see Client_id and Client_Secret, keep these two information, `Us your owns`
+![image](https://github.com/zhang435/Xiami_To_Spotify/blob/master/images/app_page.png)
+https://github.com/zhang435/Xiami_To_Spotify/blob/master/images/get_id_sec.png
+- [ ] You will also see Redirect URIs after it, in there Past [http://github.com/zhang435/Xiami_To_Spotify/](http://github.com/zhang435/Xiami_To_Spotify/) and click add
     Now download the [code](https://github.com/zhang435/Xiami_To_Spotify/archive/master.zip). remember click save at the button!
 
 - [ ] At the bottom at main.py, replace information with you own information.
