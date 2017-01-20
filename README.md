@@ -14,8 +14,11 @@ Knowing your
 - [ ] password
 
 ####     Spotify:
-- [ ] username (if your username if from facebook, or have space between, this app may not work for you, change ti to one word)
+- [ ] username (if your username if from facebook, or have space between, this app may not work for you, change it to one word)
+
+![image](https://drive.google.com/open?id=0B1ClAnzq00KsQzNESlgxcGhMRDA)
 - [ ] [Spotify Application Sign in with your spotify account](https://developer.spotify.com/my-applications/)
+![Alt text](/relative/path/to/img.jpg?raw=true "Optional Title")
 - [ ] Create Application (name whatever you want, I personally recommand 'Xiami_connection' for example)
 - [ ] after you successfully create an application, you will see Client_id and Client_Secret, keep these two information
 
