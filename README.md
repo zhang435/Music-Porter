@@ -37,7 +37,8 @@ move.start()
 `pip install request`
 `pip install spotipy`
 
-- [ ] Finally, in terminal run `python main.py`
+- [ ] Finally, in terminal run `python main.py`, if everything set up correctly, you should get a brower pop up on your computer, copy the link and paste it into terminal, then, just wait
+
 
 
 ## Reference:
