@@ -1,6 +1,6 @@
 # Xiami_To_Spotify
 
-## This App no longer works due SPotif API changed, XIAMI fetch still working though
+## This App no longer works due Spotify API changed, XIAMI fetch still working though
 ## introduction:
 This is a project in purpose to enable user to transfer music from [Xiami](http://www.xiami.com) to [Spotify](https://www.spotify.com/us/).
 
