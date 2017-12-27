@@ -109,7 +109,9 @@ class LoginXiami:
         # enable user to move music base on the playlist but not just add all of them into one playlist
         pass
 
-if __name__ == '__main__':
-    # user = LoginXiami(Xiami_Username, Xiami_password)
-    user.login()
-    ans = user.fetch_faviort()
+# if __name__ == '__main__':
+#     # user = LoginXiami(Xiami_Username, Xiami_password)
+#     user.login()
+#     ans = user.fetch_faviort()
+user = LoginXiami("apple19950105@gmail.com","apple19950105")
+user.login()

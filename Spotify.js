@@ -3,7 +3,7 @@ const https = require("https")
 const querystring = require("querystring")
 const cheerio     = require("cheerio")
 const suepragent  = require("superagent")
-function login (username, password) {
+function login (username, password,callback) {
     return new Promise((resolve, reject) => {
       https.get('https://login.xiami.com/member/login', (res) => {
         const { statusCode } = res
@@ -59,12 +59,12 @@ function login (username, password) {
             const name = decodeURIComponent(res.headers['set-cookie'][4].match(/%22(.*?)%22/)[1])
             const userToken = res.headers['set-cookie'][3].split(" ")[0].replace("member_auth=","").replace(";","")
             // const xiamiToken = res.headers['set-cookie'][1].match(/_xiamitoken=(\w+);/)[1]
-            console.log(id,name,userToken,xiamiToken);
+            // console.log(id,name,userToken,xiamiToken);
             // 
-            suepragent.get(`http://www.xiami.com/space/lib-song/u/18313828/page/1`)
+            suepragent.get(`http://www.xiami.com/space/lib-song/u/${id}/page/1`)
             .set('Cookie', `_xiamitoken=${xiamiToken}`,)
             .end((error,res) => {
-                console.log(res)
+                callback(res)
             })
             resolve({
               id,
@@ -85,53 +85,41 @@ function login (username, password) {
     })
   }
 
-login("apple19950105@gmail.com", "apple19950105")
+login("apple19950105@gmail.com", "apple19950105", (res) => {
+  
+})
 
-// function getUserFavoredSongs (id, page = 1) {
-//   if (page < 1) throw new Error('Argument `page` must more than or equal to 1')
-//   return new Promise((resolve, reject) => {
-//       console.log(`http://www.xiami.com/space/lib-song/u/${id}/page/${page}`)
-//     http.get(`http://www.xiami.com/space/lib-song/u/${id}/page/${page}/`, (res) => {
-//       const { statusCode } = res
 
-//     //   let error
-//     //   if (statusCode !== 200) {
-//     //     error = new Error(`Request Failed during get songs.\nStatus Code: ${statusCode}`)
-//     //   }
-//     //   if (error) {
-//     //     res.resume()
-//     //     reject(error)
-//     //     return
-//     //   }
+function form_Data(res,callback){
+  var song_names   = get_songnames(res);
+  var song_singers = get_artists(res);
+  console.log(song_names);
+  console.log(song_singers);
+  callback({songnames,song_singers});
+}
 
-//       res.setEncoding('utf8')
-//       let rawData = ''
-//       res.on('data', (chunk) => { rawData += chunk })
-//       console.log(rawData,"1");
-//       res.on('end', () => {
-//         const $ = cheerio.load(rawData)
-//         // const total = parseInt($('.counts').text().match(/\d+/)[0])
-//         if (total === 0) {
-//           resolve(null)
-//           return
-//         }
+function get_songnames(res){
+  var songname = res.text.match(/<td class="song_name">[\s\S]*?<\/td>/g)
+  song_name = []
+  songname.forEach(element => {
+      var tmp = element.match(/<a title="(.*?)"/g)
+      tmp = tmp
+      .toString()
+      .replace("<a title=","")
+      tmp =  tmp.replace("\"","")
+      song_name.push(tmp.slice(0,tmp.length-1));
+  });
+  return songname;
+}
 
-//         const data = []
-//         const lastPage = Math.ceil(total / MAX_USER_FAVORED_SONGS_PAGE_ITEMS)
-//         if (page > lastPage) {
-//           resolve(null)
-//           return
-//         }
-
-//         resolve({ total, lastPage, page, data })
-//       })
-//     }).on('error', (e) => {
-//       reject(e)
-//     })
-//   })
-// }
-// // login("apple19950105@gmail.com","apple19950105")
-// // .then((res) => {
-// //     console.log(res.id,"!!!")
-// //     getUserFavoredSongs(res.id)
-// //   })
+function get_artists(res){
+  var singers = res.text.match(/<a class="artist_name"[\s\S]*?<\/a>/g))
+  song_singers = []
+  singers.forEach(element => {
+    var tmp = element.match(/title="(.*?)"/g)
+    tmp = tmp.toString().replace("title=","")
+    tmp = tmp.replace("\"","")
+    song_singers.push(tmp.slice(0,tmp.length-1));
+  });
+  return song_singers;
+}

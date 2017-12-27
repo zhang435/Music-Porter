@@ -1,0 +1,25 @@
+{
+  "name": "xiami_to_spotify",
+  "version": "1.0.0",
+  "description": "",
+  "main": "Spotify.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhang435/Xiami_To_Spotify.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zhang435/Xiami_To_Spotify/issues"
+  },
+  "homepage": "https://github.com/zhang435/Xiami_To_Spotify#readme",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "crawler": "^1.1.2",
+    "querystring": "^0.2.0",
+    "superagent": "^3.8.2"
+  }
+}
