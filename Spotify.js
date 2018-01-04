@@ -63,7 +63,7 @@ function get_user_id(access_token,callback){
       };   
     
       request.get(options,(error,response,body) => {
-        callback(body.id,access_token);
+        callback(body.id);
       });
 }
 
@@ -103,16 +103,10 @@ function create_playlist(user_id,access_token,callback){
                 // create playlist if not 
                 request.post(options,(error,response,body) => {
                     console.log("playlist created");
-                    setTimeout(() => {
-                        callback(access_token)    
-                    }, 2000);
-                    
+                    callback();
                 })
             }else{
-                setTimeout(() => {
-                    callback(access_token) 
-                }, 2000);
-                
+                callback() 
             }
         }
 
@@ -167,18 +161,14 @@ function add_song_to_playlist(user_id,playlist_id,track_uri,access_token){
     })
 }
 
-function add(track,artist,access_token){
+function add(track,artist,user_id,access_token){
     // main function
-    create_playlist("zhang435",access_token,(access_token) => {
-    get_user_id(access_token,(user_id,access_token) => {
     get_playlist_id(access_token,(playlist_id,access_token) => {
     get_song_id(track,artist,access_token,(track_id,uri) => {
     add_song_to_playlist(user_id,playlist_id,uri,access_token)
         console.log("end");
     })
     })
-    })
-    });
     
     
 }

@@ -51,9 +51,18 @@ app.get("/callback",(req,res) => {
             refresh_token = body.refresh_token;
         
         //  Spotify.add("Sorry","Justin Bieber" , access_token)
+        // Xiami.get_user_playlist("apple19950105@gmail.com", "apple19950105" , (res) => {
+        //     Object.keys(res).forEach((element) => {
+        //         Spotify.add(element,res[element] , access_token)
+        //     })
+        // })
+        Spotify.get_user_id(access_token,(user_id) => {
+        Spotify.create_playlist(user_id,access_token,() => {
         Xiami.get_user_playlist("apple19950105@gmail.com", "apple19950105" , (res) => {
             Object.keys(res).forEach((element) => {
-                Spotify.add(element,res[element] , access_token)
+                Spotify.add(element,res[element] ,user_id, access_token)
+                    })
+                })
             })
         })
         res.send(access_token)
