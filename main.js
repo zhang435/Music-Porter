@@ -1,9 +1,11 @@
 
-var express = require('express'); // Express web server framework
-var request = require('request'); // "Request" library
-var querystring = require('querystring');
-const Spotify   = require("./Spotify");
-const app = express();
+const express     = require('express'); // Express web server framework
+const request     = require('request'); // "Request" library
+const querystring = require('querystring');
+const Spotify     = require("./Spotify");
+const Xiami       = require("./Xiami");
+const app         = express();
+
 
 app.get("/login",(req,res) => {
     /**
@@ -48,8 +50,13 @@ app.get("/callback",(req,res) => {
         var access_token  = body.access_token,
             refresh_token = body.refresh_token;
         
-         Spotify.add("Sorry","Justin Bieber" , access_token)
-         res.send(access_token)
+        //  Spotify.add("Sorry","Justin Bieber" , access_token)
+        Xiami.get_user_playlist("apple19950105@gmail.com", "apple19950105" , (res) => {
+            Object.keys(res).forEach((element) => {
+                Spotify.add(element,res[element] , access_token)
+            })
+        })
+        res.send(access_token)
         // add_song_into_spotify(access_token,refresh_token)
 
     })

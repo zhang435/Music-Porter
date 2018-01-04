@@ -24,6 +24,11 @@ module.exports = {
 }
 
 function get_song_id(track,artirst,access_token,callback){
+    /**
+     * get_song_id : get the track id base on track astrist 
+     * para @{String, String , String ,function}
+     * https://developer.spotify.com/web-api/search-item/
+     */
     var options = {
         url: "https://api.spotify.com/v1/search?q="+track+"&type=track",
         headers: { 'Authorization': 'Bearer ' + access_token},
@@ -31,18 +36,26 @@ function get_song_id(track,artirst,access_token,callback){
       };
     
     request.get(options,(error, response, body)=> {
-        for(var i = 0; i< body.tracks.items.length; i++){
-            element = body.tracks.items[i];
-            if(element['artists'][0]['name'].toLowerCase() === artirst.toLowerCase()){
-                console.log(element.id,element.uri,"?");
-                callback(element.id,element.uri)
-                break;
+        if(response.statusCode !== 400){
+            for(var i = 0; i< body.tracks.items.length; i++){
+                element = body.tracks.items[i];
+
+                if(element['artists'][0]['name'].toLowerCase() === artirst.toLowerCase()){
+                    console.log(element.id,element.uri,"?");
+                    callback(element.id,element.uri)
+                    break;
+                }
             }
         }
     })
 }
 
 function get_user_id(access_token,callback){
+    /**
+     * get_user_id : get username of current user
+     * @(String,function)
+     * https://developer.spotify.com/web-api/get-current-users-profile/
+     */
     var options = {
         url: "https://api.spotify.com/v1/me",
         headers: { 'Authorization': 'Bearer ' + access_token},
@@ -54,8 +67,13 @@ function get_user_id(access_token,callback){
       });
 }
 
-function create_playlist(user_id,access_token){
-    // check if playlsit already exist 
+function create_playlist(user_id,access_token,callback){
+    /**
+     * create_playlist : create a playlist if playlistname not exist 
+     * @(String,function)
+     * https://developer.spotify.com/web-api/create-playlist/
+     */
+    
     var options = {
         url : "https://api.spotify.com/v1/users/"+user_id+"/playlists",
         headers: {
@@ -65,31 +83,49 @@ function create_playlist(user_id,access_token){
     }
 
     request.get(options,(error,response,body) =>{
-        var playlists = body.items.map(x => x.name)
-        console.log(playlists)
-        if(!playlists.includes(playlist_name)){
-            var options = {
-                url: 'https://api.spotify.com/v1/users/' + user_id + '/playlists',
-                body: JSON.stringify({
-                    'name': playlist_name,
-                    'public': true
-                }),
-                dataType:'json',
-                headers: {
-                    'Authorization': 'Bearer ' + access_token,
-                    'Content-Type': 'application/json',
-                }
-            }; 
-            
-              request.post(options,(error,response,body) => {
-                  console.log("playlist created");
-              })
+        if(response.statusCode !== 400){
+            var playlists = body.items.map(x => x.name)
+            console.log(playlists,playlist_name,playlists.includes(playlist_name))
+            // check if playlist already exist 
+            if(!playlists.includes(playlist_name)){
+                var options = {
+                    url: 'https://api.spotify.com/v1/users/' + user_id + '/playlists',
+                    body: JSON.stringify({
+                        'name': playlist_name,
+                        'public': true
+                    }),
+                    dataType:'json',
+                    headers: {
+                        'Authorization': 'Bearer ' + access_token,
+                        'Content-Type': 'application/json',
+                    }
+                };
+                // create playlist if not 
+                request.post(options,(error,response,body) => {
+                    console.log("playlist created");
+                    setTimeout(() => {
+                        callback(access_token)    
+                    }, 2000);
+                    
+                })
+            }else{
+                setTimeout(() => {
+                    callback(access_token) 
+                }, 2000);
+                
             }
+        }
+
         })
     }
 
 
 function get_playlist_id(access_token,callback){
+    /**
+     * get_playlist_id : get the playlist id for playlist name 
+     * @(String , function)
+     * https://developer.spotify.com/web-api/get-a-list-of-current-users-playlists/
+     */
     var options = {
         url: "https://api.spotify.com/v1/users/zhang435/playlists",
         headers: { 'Authorization': 'Bearer ' + access_token},
@@ -110,6 +146,11 @@ function get_playlist_id(access_token,callback){
 
 
 function add_song_to_playlist(user_id,playlist_id,track_uri,access_token){
+    /**
+     * add_song_to_playlist : add song into playlist 
+     * @(String, String, Strin, function)
+     * add song into playlist 
+     */
     var options = {
         url : "https://api.spotify.com/v1/users/"+user_id+"/playlists/"+playlist_id+"/tracks",
         headers: {
@@ -127,13 +168,17 @@ function add_song_to_playlist(user_id,playlist_id,track_uri,access_token){
 }
 
 function add(track,artist,access_token){
-    create_playlist("zhang435",access_token);
+    // main function
+    create_playlist("zhang435",access_token,(access_token) => {
     get_user_id(access_token,(user_id,access_token) => {
     get_playlist_id(access_token,(playlist_id,access_token) => {
     get_song_id(track,artist,access_token,(track_id,uri) => {
     add_song_to_playlist(user_id,playlist_id,uri,access_token)
-    console.log("end");
+        console.log("end");
     })
     })
     })
+    });
+    
+    
 }
