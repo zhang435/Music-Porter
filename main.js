@@ -48,8 +48,12 @@ app.get("/callback",(req,res) => {
         var access_token  = body.access_token,
             refresh_token = body.refresh_token;
         // res.send(access_token);
-        Spotify.get_song_info("friends",'Justin Bieber',access_token);
-        res.send(access_token)
+        // Spotify.get_song_info("friends",'Justin Bieber',access_token);
+        // Spotify.create_playlist("zhang435",access_token)
+        // Spotify.create_playlist();
+        
+         Spotify.add(access_token)
+         res.send(access_token)
         // add_song_into_spotify(access_token,refresh_token)
 
     })
