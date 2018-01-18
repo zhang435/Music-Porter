@@ -8,14 +8,11 @@ var querystring = require('querystring');
 const CLIENT_ID     = 'c778e8173793481c907f2ee677fdf578'; // Your client id
 const CLIENT_SECRET = '3d5d8daa997a4b29b11100d55b018ad2'; // Your secret
 const REDIRECT_URI  = 'http://localhost:8888/callback'; // Your redirect uri
-const SCOPE         = 'playlist-modify-public playlist-read-collaborative'
+const SCOPE         = 'playlist-modify-public playlist-read-collaborative playlist-modify-private'
 const playlist_name = "tmp"
 const rp            = require("request-promise");
 
 // in spotify , 戴佩妮 been record as Penny Tai, her song is ony avaliable if I search with offical name, use a dic to stoore this information 
-var artist_dic = {}
-var reload_time = 300
-
 // request authorization tp access data
 module.exports = {
     CLIENT_ID,
@@ -26,10 +23,19 @@ module.exports = {
     get_user_id,
     create_playlist,
     get_playlist_id,
-    add_song_to_playlist
+    add_song_to_playlist,
+    lala
 }
 
-function get_artist_offical_name(artist,access_token) {
+function lala(){
+    return new Promise((resolve,reject) => {
+        setTimeout(() => {
+          resolve(1);
+        }, 4000);
+      });
+}
+
+async function get_artist_offical_name(artist,access_token) {
     /***
      * during spotify searching, it is more accurate to get the official name that spotify recorded
      * the search return a new promise with artist offical name 
@@ -47,12 +53,14 @@ function get_artist_offical_name(artist,access_token) {
                 resolve(body.artists.items[0].name);
             else
                 reject("Unable to find artirst" + artist);
-        }).catch((error) => "error during get_artist_offical_name" + error)
+        }).catch((error) => {
+            "error during get_artist_offical_name" + error + error.status;
+    })
     })
 }
 
 
-function get_song_uri(track,artist,access_token){
+async function get_song_uri(track,artist,access_token){
     /**
      * get_song_uri : get the uri match to track , which will be used in when add music
      * String  -> String -> String -> Promise
@@ -64,10 +72,13 @@ function get_song_uri(track,artist,access_token){
             var options = {
                 url: "https://api.spotify.com/v1/search?q="+encodeURIComponent(track)+"&type=track",
                 headers: { 'Authorization': 'Bearer ' + access_token},
-                json: true
+                json: true,
+                resolveWithFullResponse: true
             };
             rp(options)
-            .then((body) => {
+            .then((response) => {
+                body = response.body;
+                
                 if(body.tracks && body.tracks.items) {
                     for(var i = 0; i< body.tracks.items.length; i++) {
                         element = body.tracks.items[i];
@@ -78,13 +89,22 @@ function get_song_uri(track,artist,access_token){
                     }
                 }
                 reject(`Unable to find data for ${track} ${name}`)
-            }).catch((error) => reject("get_song_id Error code " + error.message))
+            }).catch((error) => {
+                    // if(error.statusCode === 429){
+                    //     (async ()=>{
+                    //         console.log("cool down")
+                    //           var result = await lala();
+                    //     })();
+                    //     return get_song_uri(track,artist,access_token)
+                    // }
+                    reject("get_song_id Error code " + error );
+            })
         }).catch(error => reject(error));
     })
 }
 
 
-function get_user_id(access_token) {
+async function get_user_id(access_token) {
     /**
      * get_user_id : return the user id for the user, some user created with facebook may encounter actual useranme does not match with the one they know
      * String -> Promise
@@ -106,7 +126,7 @@ function get_user_id(access_token) {
 }
 
 
-function check_playlist(user_id,access_token) {
+async function check_playlist(user_id,access_token) {
     /**
      * check_playlist : all the song fetch from xiami will been store in a playlist, which name as tmp, this is just prevent dupliate creation 
      * String -> String -> Promise
@@ -132,7 +152,7 @@ function check_playlist(user_id,access_token) {
 }
 
 
-function create_playlist(user_id,access_token){
+async function create_playlist(user_id,access_token){
     /**
      * create_playlist : create defualt playlist 
      * String -> String -> Promise
@@ -166,7 +186,7 @@ function create_playlist(user_id,access_token){
 }
 
 
-function get_playlist_id(user_id,access_token) {
+async function get_playlist_id(user_id,access_token) {
     /**
      * get_playlist_id : get the playlist id for playlist name 
      * * https://developer.spotify.com/web-api/get-a-list-of-current-users-playlists/
@@ -192,7 +212,7 @@ function get_playlist_id(user_id,access_token) {
     })
 }
 
-function add_song_to_playlist(user_id,playlist_id,track_uri,access_token){
+async function add_song_to_playlist(user_id,playlist_id,track_uri,access_token){
     /**
      * add song to playlist
      * String, String ,String ,String , String -> Promise
@@ -214,7 +234,16 @@ function add_song_to_playlist(user_id,playlist_id,track_uri,access_token){
         .then(body => {
             resolve("");
         })
-        .catch(error => reject("add_song_to_playlist Error code : " + error));
+        .catch(error => {
+            // if(error.statusCode === 429){
+            //     var x = (async ()=>{
+            //         console.log("cool down")
+            //           var result = await lala();
+            //     })();
+            //     return add_song_to_playlist(user_id,playlist_id,track_uri,access_token)
+            // }
+            reject("add_song_to_playlist Error code : " + error)
+        });
     })
 }
 

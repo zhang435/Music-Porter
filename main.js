@@ -67,8 +67,7 @@ app.get("/callback",(req,res) => {
         // })
         
         Spotify.get_user_id(access_token)
-        .then(username => {
-          return Spotify.create_playlist(username,access_token)})
+        .then(username => { return Spotify.create_playlist(username,access_token)})
         .then(_ => {
         Spotify.get_user_id(access_token)
         .then(username => {
@@ -78,9 +77,11 @@ app.get("/callback",(req,res) => {
             Object.keys(res).forEach((element) => {
                 Spotify.get_song_uri(element,res[element],access_token)
                 .then(track_uri => {
-                    Spotify.add_song_to_playlist(username,playlist,track_uri,access_token)
-                    .then(_ => console.log(`success add ${element} by ${res[element]}`))
-                    .catch(error => console.log(error))
+                Spotify.add_song_to_playlist(username,playlist,track_uri,access_token)
+                .then(res => {
+                // res.send("add song" + element)
+                })
+                .catch(error => {console.log(error)})
                 })
                 .catch(error => console.log(error))
                 })

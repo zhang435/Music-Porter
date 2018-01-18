@@ -20,6 +20,7 @@
     "cheerio": "^1.0.0-rc.2",
     "crawler": "^1.1.2",
     "express": "^4.16.2",
+    "nodemon": "^1.14.11",
     "querystring": "^0.2.0",
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
