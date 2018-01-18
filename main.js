@@ -56,15 +56,40 @@ app.get("/callback",(req,res) => {
         //         Spotify.add(element,res[element] , access_token)
         //     })
         // })
-        Spotify.get_user_id(access_token,(user_id) => {
-        Spotify.create_playlist(user_id,access_token,() => {
+        // Spotify.get_user_id(access_token,(user_id) => {
+        // Spotify.create_playlist(user_id,access_token,() => {
+        // Xiami.get_user_playlist("apple19950105@gmail.com", "apple19950105" , (res) => {
+        //     Object.keys(res).forEach((element) => {
+        //         Spotify.add(element,res[element] ,user_id, access_token)
+        //             })
+        //         })
+        //     })
+        // })
+        
+        Spotify.get_user_id(access_token)
+        .then(username => {
+          return Spotify.create_playlist(username,access_token)})
+        .then(_ => {
+        Spotify.get_user_id(access_token)
+        .then(username => {
+        Spotify.get_playlist_id(username,access_token)
+        .then(playlist => {
         Xiami.get_user_playlist("apple19950105@gmail.com", "apple19950105" , (res) => {
             Object.keys(res).forEach((element) => {
-                Spotify.add(element,res[element] ,user_id, access_token)
-                    })
+                Spotify.get_song_uri(element,res[element],access_token)
+                .then(track_uri => {
+                    Spotify.add_song_to_playlist(username,playlist,track_uri,access_token)
+                    .then(_ => console.log(`success add ${element} by ${res[element]}`))
+                    .catch(error => console.log(error))
+                })
+                .catch(error => console.log(error))
                 })
             })
+        }).catch(error => console.log(error))
+        }).catch(error => console.log(error))            
         })
+
+
         res.send(access_token)
         // add_song_into_spotify(access_token,refresh_token)
 
