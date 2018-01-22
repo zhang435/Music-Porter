@@ -75,12 +75,12 @@ function login (username, password,callback) {
               .set('Cookie', `_xiamitoken=${xiamiToken}`,)
               .end((error,res) => {
                   var total = total_page(res);
-                  for(var i = 1; i <= total; i++){
-                    suepragent.get(`http://www.xiami.com/space/lib-song/u/${id}/page/${i}`)
-                    .set('Cookie', `_xiamitoken=${xiamiToken}`,)
-                    .end((error,res) => {
-                        callback(generate_song_singer(res));
-                    })
+                  for(var i = 1; i <= 1; i++){
+                      suepragent.get(`http://www.xiami.com/space/lib-song/u/${id}/page/${i}`)
+                      .set('Cookie', `_xiamitoken=${xiamiToken}`,)
+                      .end((error,res) => {
+                          callback(generate_song_singer(res));
+                      })  
                   }
               })
             resolve({

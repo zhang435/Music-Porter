@@ -26,5 +26,8 @@
     "request-promise": "^4.2.2",
     "superagent": "^3.8.2",
     "utf8": "^3.0.0"
+  },
+  "devDependencies": {
+    "prettier": "1.10.2"
   }
 }

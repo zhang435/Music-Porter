@@ -6,6 +6,7 @@ const Spotify     = require("./Spotify");
 const Xiami       = require("./Xiami");
 const app         = express();
 
+ 
 
 app.get("/login",(req,res) => {
     /**
@@ -74,23 +75,13 @@ app.get("/callback",(req,res) => {
         Spotify.get_playlist_id(username,access_token)
         .then(playlist => {
         Xiami.get_user_playlist("apple19950105@gmail.com", "apple19950105" , (res) => {
-            Object.keys(res).forEach((element) => {
-                Spotify.get_song_uri(element,res[element],access_token)
-                .then(track_uri => {
-                Spotify.add_song_to_playlist(username,playlist,track_uri,access_token)
-                .then(res => {
-                // res.send("add song" + element)
-                })
-                .catch(error => {console.log(error)})
-                })
-                .catch(error => console.log(error))
-                })
-            })
+        Object.keys(res).forEach((element) => {
+            Spotify.add(username,element,res[element],playlist,access_token).catch(_ => console.log("?"));
+        })
+        })
         }).catch(error => console.log(error))
         }).catch(error => console.log(error))            
         })
-
-
         res.send(access_token)
         // add_song_into_spotify(access_token,refresh_token)
 

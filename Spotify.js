@@ -24,18 +24,18 @@ module.exports = {
     create_playlist,
     get_playlist_id,
     add_song_to_playlist,
-    lala
+    add,
 }
 
-function lala(){
-    return new Promise((resolve,reject) => {
+function wait(msec){
+    return new Promise((resolve,_) => {
         setTimeout(() => {
-          resolve(1);
-        }, 4000);
-      });
+            resolve();
+        }, msec);
+    })
 }
 
-async function get_artist_offical_name(artist,access_token) {
+function get_artist_offical_name(artist,access_token) {
     /***
      * during spotify searching, it is more accurate to get the official name that spotify recorded
      * the search return a new promise with artist offical name 
@@ -66,41 +66,41 @@ async function get_song_uri(track,artist,access_token){
      * String  -> String -> String -> Promise
      * => Promise with uri as value
      */
+    var name  = await get_artist_offical_name(artist,access_token).catch(_ => -1);
+
+    if(name === -1){
+        var    _  = await wait(2000);
+        var ans = get_song_uri(track,artist,access_token);
+        return new Promise(resolve => (resolve(ans)));
+    }
+
+    var    _  = await wait(500);
+    var options = {
+        url: "https://api.spotify.com/v1/search?q="+encodeURIComponent(track)+"&type=track",
+        headers: { 'Authorization': 'Bearer ' + access_token},
+        json: true,
+        resolveWithFullResponse: true
+    };
+
+
     return new Promise((resolve,reject) => {
-        get_artist_offical_name(artist,access_token)
-        .then((name) => {
-            var options = {
-                url: "https://api.spotify.com/v1/search?q="+encodeURIComponent(track)+"&type=track",
-                headers: { 'Authorization': 'Bearer ' + access_token},
-                json: true,
-                resolveWithFullResponse: true
-            };
-            rp(options)
-            .then((response) => {
-                body = response.body;
+        rp(options)
+        .then((response) => {
+            body = response.body;
                 
-                if(body.tracks && body.tracks.items) {
-                    for(var i = 0; i< body.tracks.items.length; i++) {
-                        element = body.tracks.items[i];
-                        if(encodeURIComponent(element['artists'][0]['name'].toLowerCase()) === encodeURIComponent(name.toLowerCase())) {
-                            resolve(element.uri);
-                            break;
+            if(body.tracks && body.tracks.items) {
+                for(var i = 0; i< body.tracks.items.length; i++) {
+                    element = body.tracks.items[i];
+                    if(encodeURIComponent(element['artists'][0]['name'].toLowerCase()) === encodeURIComponent(name.toLowerCase())) {
+                        resolve(element.uri);
                         }
                     }
                 }
                 reject(`Unable to find data for ${track} ${name}`)
             }).catch((error) => {
-                    // if(error.statusCode === 429){
-                    //     (async ()=>{
-                    //         console.log("cool down")
-                    //           var result = await lala();
-                    //     })();
-                    //     return get_song_uri(track,artist,access_token)
-                    // }
                     reject("get_song_id Error code " + error );
             })
-        }).catch(error => reject(error));
-    })
+        })
 }
 
 
@@ -232,7 +232,7 @@ async function add_song_to_playlist(user_id,playlist_id,track_uri,access_token){
     return new Promise((resolve,reject) => {
         rp(options)
         .then(body => {
-            resolve("");
+            resolve(_);
         })
         .catch(error => {
             // if(error.statusCode === 429){
@@ -245,6 +245,13 @@ async function add_song_to_playlist(user_id,playlist_id,track_uri,access_token){
             reject("add_song_to_playlist Error code : " + error)
         });
     })
+}
+
+async function add(username,artist,track,playlist_id,access_token){
+    var uri = await get_song_uri(track,artist,access_token).catch(error => console.log(error));
+    add_song_to_playlist(username,playlist_id,uri,access_token)
+    // .then(res => "add success")
+    .catch(err => err);
 }
 
 // // get_artist_offical_name("Justin bieber" , "BQClCYXKZ_AUHkiJ-LrR5AH0Qv872VEzz7C0YIxDwL7xwyeJgtoykeVGaQNoDdqTKCZgu5suapI5FydfTgx69UYoQTzh9wEQOSb_um7Fj949hbrkXHl-UeweRfAWRX9FQzxqqfcWwMPlw3dAFBcXAN2vHjwAyE19NbwyCc4pN41W2kN6fw")
