@@ -5,6 +5,8 @@ const querystring = require('querystring');
 const Spotify     = require("./Spotify");
 const Xiami       = require("./Xiami");
 const app         = express();
+const account     = require("./account")
+
 
 
 app.get("/login",(req,res) => {
@@ -58,7 +60,7 @@ app.get("/callback",(req,res) => {
         // })
         Spotify.get_user_id(access_token,(user_id) => {
         Spotify.create_playlist(user_id,access_token,() => {
-        Xiami.get_user_playlist("apple19950105@gmail.com", "apple19950105" , (res) => {
+        Xiami.get_user_playlist(account.xiami_username, account.xiami_password , (res) => {
             Object.keys(res).forEach((element) => {
                 Spotify.add(element,res[element] ,user_id, access_token)
                     })
