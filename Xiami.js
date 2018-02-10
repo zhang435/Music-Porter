@@ -75,7 +75,7 @@ function login (username, password,callback) {
               .set('Cookie', `_xiamitoken=${xiamiToken}`,)
               .end((error,res) => {
                   var total = total_page(res);
-                  for(var i = 1; i <= 1; i++){
+                  for(var i = 1; i <= 5; i++){
                       suepragent.get(`http://www.xiami.com/space/lib-song/u/${id}/page/${i}`)
                       .set('Cookie', `_xiamitoken=${xiamiToken}`,)
                       .end((error,res) => {
@@ -123,6 +123,7 @@ function generate_song_singer(res){
         song_singers[song] = singer
     })
     // console.log(song_singers);
+    console.log(song_singers);
     return song_singers;
 }
 

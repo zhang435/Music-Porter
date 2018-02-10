@@ -96,7 +96,9 @@ async function get_song_uri(track,artist,access_token){
                         }
                     }
                 }
-                reject(`Unable to find data for ${track} ${name}`)
+                reject({
+                    message: `Unable to find data for ${track} ${name}`
+                    })
             }).catch((error) => {
                     reject("get_song_id Error code " + error );
             })

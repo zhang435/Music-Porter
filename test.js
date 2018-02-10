@@ -1,15 +1,12 @@
-function A(){
-    return new Promise((resolve,reject) =>{
-        setTimeout(() => {
-            reject("A");    
-        }, 2000);
-        
+
+function a(){
+    return new Promise((resolve,reject) => {
+        reject({error :1});
     })
 }
-
-async function B(){
-    var x = await A().catch(_ => -1);
+async function b(){
+    var x = await a().catch(error => error);
     console.log(x);
 }
 
-B()
+b()
