@@ -1,16 +1,15 @@
-
 // referene from https://developer.spotify.com/web-api/authorization-guide/
 // this is build base on the instruction , the flow of 
-var express     = require('express'); // Express web server framework
-var request     = require('request'); // "Request" library
+var express = require('express'); // Express web server framework
+var request = require('request'); // "Request" library
 var querystring = require('querystring');
 
-const CLIENT_ID     = 'c778e8173793481c907f2ee677fdf578'; // Your client id
+const CLIENT_ID = 'c778e8173793481c907f2ee677fdf578'; // Your client id
 const CLIENT_SECRET = '3d5d8daa997a4b29b11100d55b018ad2'; // Your secret
-const REDIRECT_URI  = 'http://localhost:8888/callback'; // Your redirect uri
-const SCOPE         = 'playlist-modify-public playlist-read-collaborative playlist-modify-private'
+const REDIRECT_URI = 'http://localhost:8888/callback'; // Your redirect uri
+const SCOPE = 'playlist-modify-public playlist-read-collaborative playlist-modify-private'
 const playlist_name = "tmp"
-const rp            = require("request-promise");
+const rp = require("request-promise");
 
 // in spotify , 戴佩妮 been record as Penny Tai, her song is ony avaliable if I search with offical name, use a dic to stoore this information 
 // request authorization tp access data
@@ -27,82 +26,86 @@ module.exports = {
     add,
 }
 
-function wait(msec){
-    return new Promise((resolve,_) => {
+function wait(msec) {
+    return new Promise((resolve, _) => {
         setTimeout(() => {
             resolve();
         }, msec);
     })
 }
 
-function get_artist_offical_name(artist,access_token) {
+function get_artist_offical_name(artist, access_token) {
     /***
      * during spotify searching, it is more accurate to get the official name that spotify recorded
      * the search return a new promise with artist offical name 
      */
     var options = {
-        url: "https://api.spotify.com/v1/search?q="+encodeURIComponent(artist)+"&type=artist",
-        headers: { 'Authorization': 'Bearer ' + access_token},
+        url: "https://api.spotify.com/v1/search?q=" + encodeURIComponent(artist) + "&type=artist",
+        headers: {
+            'Authorization': 'Bearer ' + access_token
+        },
         json: true
     };
 
-    return new Promise((resolve,reject) => {
+    return new Promise((resolve, reject) => {
         rp(options)
-        .then((body) => {
-            if(body.artists && body.artists.items.length != 0)
-                resolve(body.artists.items[0].name);
-            else
-                reject("Unable to find artirst" + artist);
-        }).catch((error) => {
-            "error during get_artist_offical_name" + error + error.status;
-    })
+            .then((body) => {
+                if (body.artists && body.artists.items.length != 0)
+                    resolve(body.artists.items[0].name);
+                else
+                    reject("Unable to find artirst" + artist);
+            }).catch((error) => {
+                "error during get_artist_offical_name" + error + error.status;
+            })
     })
 }
 
 
-async function get_song_uri(track,artist,access_token){
+async function get_song_uri(track, artist, access_token) {
     /**
      * get_song_uri : get the uri match to track , which will be used in when add music
      * String  -> String -> String -> Promise
      * => Promise with uri as value
      */
-    var name  = await get_artist_offical_name(artist,access_token).catch(_ => -1);
+    var name = await get_artist_offical_name(artist, access_token).catch(_ => -1);
 
-    if(name === -1){
-        var    _  = await wait(2000);
-        var ans = get_song_uri(track,artist,access_token);
+    if (name === -1) {
+        var _ = await wait(2000);
+        var ans = get_song_uri(track, artist, access_token);
         return new Promise(resolve => (resolve(ans)));
     }
 
-    var    _  = await wait(500);
+    var _ = await wait(500);
     var options = {
-        url: "https://api.spotify.com/v1/search?q="+encodeURIComponent(track)+"&type=track",
-        headers: { 'Authorization': 'Bearer ' + access_token},
+        url: "https://api.spotify.com/v1/search?q=" + encodeURIComponent(track) + "&type=track",
+        headers: {
+            'Authorization': 'Bearer ' + access_token
+        },
         json: true,
         resolveWithFullResponse: true
     };
 
 
-    return new Promise((resolve,reject) => {
+    return new Promise((resolve, reject) => {
         rp(options)
-        .then((response) => {
-            body = response.body;
-                
-            if(body.tracks && body.tracks.items) {
-                for(var i = 0; i< body.tracks.items.length; i++) {
-                    element = body.tracks.items[i];
-                    if(encodeURIComponent(element['artists'][0]['name'].toLowerCase()) === encodeURIComponent(name.toLowerCase())) {
-                        resolve(element.uri);
+            .then((response) => {
+                body = response.body;
+
+                if (body.tracks && body.tracks.items) {
+                    for (var i = 0; i < body.tracks.items.length; i++) {
+                        element = body.tracks.items[i];
+                        if (encodeURIComponent(element['artists'][0]['name'].toLowerCase()) === encodeURIComponent(name.toLowerCase())) {
+                            resolve(element.uri);
                         }
                     }
                 }
                 reject({
                     message: `Unable to find data for ${track} ${name}`
-                    })
+                })
             }).catch((error) => {
-                    reject("get_song_id Error code " + error );
+                reject("get_song_id Error code " + error);
             })
-        })
+    })
 }
 
 
@@ -114,21 +117,23 @@ async function get_user_id(access_token) {
      */
     var options = {
         url: "https://api.spotify.com/v1/me",
-        headers: { 'Authorization': 'Bearer ' + access_token},
+        headers: {
+            'Authorization': 'Bearer ' + access_token
+        },
         json: true
-      };
-      return new Promise((resolve,reject) => {
+    };
+    return new Promise((resolve, reject) => {
         rp(options)
-        .then((body) => {
-            if(body.id)
-                resolve(body.id)
-            reject("Unable to get user id")
-        }).catch((error) => reject("get_user_id Error code " + error.message))
-      })
+            .then((body) => {
+                if (body.id)
+                    resolve(body.id)
+                reject("Unable to get user id")
+            }).catch((error) => reject("get_user_id Error code " + error.message))
+    })
 }
 
 
-async function check_playlist(user_id,access_token) {
+async function check_playlist(user_id, access_token) {
     /**
      * check_playlist : all the song fetch from xiami will been store in a playlist, which name as tmp, this is just prevent dupliate creation 
      * String -> String -> Promise
@@ -136,59 +141,61 @@ async function check_playlist(user_id,access_token) {
      */
     var options = {
         url: 'https://api.spotify.com/v1/users/' + user_id + '/playlists',
-        headers: { 'Authorization': 'Bearer ' + access_token},
+        headers: {
+            'Authorization': 'Bearer ' + access_token
+        },
         json: true
-      };
+    };
 
-    return new Promise((resolve,reject) => {
+    return new Promise((resolve, reject) => {
         rp(options)
-        .then(res => {
-            res.items.forEach(element => {
-                if(element.name === playlist_name)
-                    resolve();
+            .then(res => {
+                res.items.forEach(element => {
+                    if (element.name === playlist_name)
+                        resolve();
 
-            });
-            reject();
-        })
+                });
+                reject();
+            })
     })
 }
 
 
-async function create_playlist(user_id,access_token){
+async function create_playlist(user_id, access_token) {
     /**
      * create_playlist : create defualt playlist 
      * String -> String -> Promise
      * => Promise with None
      */
     var options = {
-        method : "POST",
+        method: "POST",
         url: 'https://api.spotify.com/v1/users/' + user_id + '/playlists',
         body: JSON.stringify({
             'name': playlist_name,
             'public': true
         }),
-        dataType:'json',
+        dataType: 'json',
         headers: {
             'Authorization': 'Bearer ' + access_token,
             'Content-Type': 'application/json',
         }
     };
 
-    return new Promise((resolve,reject) => {
-        check_playlist(user_id,access_token)
-        .then(res => {
-            resolve();
-        })
-        .catch(error => {
-            rp(options)
-            .then(res =>  resolve())
-            .catch((error) => "create_playlist Error code " + error.message);
-        })
+    return new Promise((resolve, reject) => {
+        check_playlist(user_id, access_token)
+            .then(res => {
+                resolve();
+            })
+            .catch(error => {
+                rp(options)
+                    .then(res => resolve())
+                    .catch((error) => "create_playlist Error code " + error.message);
+            })
     })
 }
 
 
-async function get_playlist_id(user_id,access_token) {
+async function get_playlist_id(user_id, access_token) {
     /**
      * get_playlist_id : get the playlist id for playlist name 
      * * https://developer.spotify.com/web-api/get-a-list-of-current-users-playlists/
@@ -196,64 +203,66 @@ async function get_playlist_id(user_id,access_token) {
      * => Promise with defualt playlist id
      */
     var options = {
-        url: "https://api.spotify.com/v1/users/"+user_id+"/playlists",
-        headers: { 'Authorization': 'Bearer ' + access_token},
+        url: "https://api.spotify.com/v1/users/" + user_id + "/playlists",
+        headers: {
+            'Authorization': 'Bearer ' + access_token
+        },
         json: true
     };
 
-    return new Promise((resolve,reject) => {
+    return new Promise((resolve, reject) => {
         rp(options)
-        .then((body) => {
-            for(var i = 0; i < body.items.length; i++) {
-                element = body.items[i];
-                if(element.name === playlist_name)
-                    resolve(element.id,access_token);
-            }
-            reject("Unable to find playlist " + playlist_name);
-        }).catch((error) => reject("get_playlist_id Error code " + error.message))
+            .then((body) => {
+                for (var i = 0; i < body.items.length; i++) {
+                    element = body.items[i];
+                    if (element.name === playlist_name)
+                        resolve(element.id, access_token);
+                }
+                reject("Unable to find playlist " + playlist_name);
+            }).catch((error) => reject("get_playlist_id Error code " + error.message))
     })
 }
 
-async function add_song_to_playlist(user_id,playlist_id,track_uri,access_token){
+async function add_song_to_playlist(user_id, playlist_id, track_uri, access_token) {
     /**
      * add song to playlist
      * String, String ,String ,String , String -> Promise
      * Promise with None
      */
     var options = {
-        method : "POST",
-        url : "https://api.spotify.com/v1/users/"+user_id+"/playlists/"+playlist_id+"/tracks",
+        method: "POST",
+        url: "https://api.spotify.com/v1/users/" + user_id + "/playlists/" + playlist_id + "/tracks",
         headers: {
             'Authorization': 'Bearer ' + access_token,
             'Content-Type': 'application/json',
         },
-        body : JSON.stringify({
-            uris : [track_uri]
+        body: JSON.stringify({
+            uris: [track_uri]
         })
     }
-    return new Promise((resolve,reject) => {
+    return new Promise((resolve, reject) => {
         rp(options)
-        .then(body => {
-            resolve(_);
-        })
-        .catch(error => {
-            // if(error.statusCode === 429){
-            //     var x = (async ()=>{
-            //         console.log("cool down")
-            //           var result = await lala();
-            //     })();
-            //     return add_song_to_playlist(user_id,playlist_id,track_uri,access_token)
-            // }
-            reject("add_song_to_playlist Error code : " + error)
-        });
+            .then(body => {
+                resolve(_);
+            })
+            .catch(error => {
+                // if(error.statusCode === 429){
+                //     var x = (async ()=>{
+                //         console.log("cool down")
+                //           var result = await lala();
+                //     })();
+                //     return add_song_to_playlist(user_id,playlist_id,track_uri,access_token)
+                // }
+                reject("add_song_to_playlist Error code : " + error)
+            });
     })
 }
 
-async function add(username,artist,track,playlist_id,access_token){
-    var uri = await get_song_uri(track,artist,access_token).catch(error => console.log(error));
-    add_song_to_playlist(username,playlist_id,uri,access_token)
-    // .then(res => "add success")
-    .catch(err => err);
+async function add(username, artist, track, playlist_id, access_token) {
+    var uri = await get_song_uri(track, artist, access_token).catch(error => console.log(error));
+    add_song_to_playlist(username, playlist_id, uri, access_token)
+        // .then(res => "add success")
+        .catch(err => err);
 }
 
 // // get_artist_offical_name("Justin bieber" , "BQClCYXKZ_AUHkiJ-LrR5AH0Qv872VEzz7C0YIxDwL7xwyeJgtoykeVGaQNoDdqTKCZgu5suapI5FydfTgx69UYoQTzh9wEQOSb_um7Fj949hbrkXHl-UeweRfAWRX9FQzxqqfcWwMPlw3dAFBcXAN2vHjwAyE19NbwyCc4pN41W2kN6fw")
