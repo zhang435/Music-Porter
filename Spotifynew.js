@@ -82,7 +82,7 @@ async function check_playlist(user_id, access_token) {
 async function create_playlist(user_id, access_token) {
     /**
      * create_playlist : create defualt playlist 
-     * String -> String -> Promise
+     * String -> String -> Void
      * => Promise with None
      */
     var options = {
@@ -129,7 +129,7 @@ async function get_playlist_id(user_id, access_token) {
                 for (var i = 0; i < body.items.length; i++) {
                     element = body.items[i];
                     if (element.name === playlist_name)
-                        resolve(element.id, access_token);
+                        resolve(element.id);
                 }
                 reject({
                     message: "Unable to find playlist " + playlist_name
@@ -148,6 +148,7 @@ function get_artist_offical_name(artist, access_token) {
     /***
      * during spotify searching, it is more accurate to get the official name that spotify recorded
      * the search return a new promise with artist offical name 
+     * String -> String -> Promise
      */
     var options = {
         url: "https://api.spotify.com/v1/search?q=" + encodeURIComponent(artist) + "&type=artist",
@@ -244,7 +245,8 @@ function get_song_uri(track, artist, access_token) {
                     }
                 }
                 reject({
-                    message : `Unable to find data for ${track} ${artist}`})
+                    message: `Unable to find data for ${track} ${artist}`
+                })
             }).catch((error) => {
                 reject({
                     error: error
@@ -253,32 +255,67 @@ function get_song_uri(track, artist, access_token) {
     })
 }
 
+function print(p) {
+    console.log(p);
+}
 
 async function get_songs_uri(arr, access_token) {
+    /** 
+     * get one page of playlist from xiami and and search them one by one to get thespotify tracj uri,
+     * typeof uri !== "object" since once the promise been reject, it will return a dict contains with message or eror {error/message: ...}
+     * detail to check in get_artist_offical_name/get_song_uri
+     * [[String(track),String(artist)] ...] -> Array
+     * 
+     */
     var passed = [];
     var fail = [];
     for (var i = 0; i < arr.length; i++) {
+        print(i);
         element = arr[i];
-        // console.log(element[0], element[1], "!");
-        // var uri = await get_song_uri(element[0], artist, access_token).catch(error => error);
+
         var artist = await get_artist_offical_name(element[1], access_token).catch(error => error);
+
         if (typeof artist !== "object") {
-            // found something
             var uri = await get_song_uri(element[0], artist, access_token).catch(error => error);
-            console.log(uri);
-            console.log(typeof uri !== "object");
             if (typeof uri !== "object") {
                 passed.push(uri);
-                
-            }else{
-                // console.log(uri);
+            } else {
+                fail.push([element, uri]);
             }
         } else {
-            // console.log(artist);
+            fail.push([element, artist]);
         }
     }
-    console.log(passed, passed.length);
+    print(passed)
 
+
+    return {
+        passed,
+        fail
+    }
+
+}
+
+async function add(user_id, playlist_id, arr, access_token) {
+    /**
+     * get the playlist id and song from xiami on certain pages, then add all of them in to the playlist been created
+     * add : String -> arr[spotify uri] -> String -> Void
+     */
+
+    var options = {
+        method: "POST",
+        url: "https://api.spotify.com/v1/users/" + user_id + "/playlists/" + playlist_id + "/tracks",
+        headers: {
+            'Authorization': 'Bearer ' + access_token,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            uris: arr
+        })
+    }
+    rp(options)
+        .then(body => {})
+        .catch(error => error)
 }
 
 
@@ -416,7 +453,29 @@ var test_data = {
 }
 test_data = Object.keys(test_data).map(x => [x, test_data[x]])
 
-var access_token = "BQDm09ijDLwLcUezrGkyjBwkLkTy3qyt2m8DJfiZ7LIF4u5jw6lbwIa8hYy9UBgLo0ARZRqqsjihAU_NGc_T8ILMXE4EAe7oqRrFrfLMQEahwHMxFMG76lAQ5xA10I7hcxU_XfsnMYExmbst4UUBNjcEk3_cYPL2oCRycaTvmagr0YGyrbjldtg3_9BuuOi_8aAxjOxkaGyOalM";
+var access_token = "BQA-oYqTuYuEWS2-uWIq2NZZGkUe2fJGAV3CYnZYsIGiXN7t21tY0mJmQAFCY6Bcx2_EabVjp_FYldfWEpt7G32blqljWmIJaMBSqDSq-rDJkklW309qVIRiIoGNo-rXURq-WsUv6Vj5TEAvGZo-vvzpiLPFVnBJprp6uF87PSeM-5o9U_7uxiEFVE_gtGqwLjbAqBWHfBs_LUU";
 // console.log(test_data.length);
 
-get_songs_uri(test_data, access_token);
+// get_songs_uri(test_data, access_token);
+
+create_playlist("zhang435", access_token);
+
+async function test() {
+    var username = await get_user_id(access_token);
+
+    if (!username)
+        print("error during get username")
+    print(username)
+    var playlist = await get_playlist_id(username, access_token);
+    if (!playlist)
+        print("error during get playlist")
+    print(playlist)
+    var arr = await get_songs_uri(test_data, access_token);
+    // print(arr)
+    if (!arr)
+        print("error during get song uri")
+    // print(arr)
+    add("zhang435", playlist, arr.passed, access_token);
+}
+
+test()
