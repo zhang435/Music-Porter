@@ -1,9 +1,12 @@
-function foo(x,callback) {
-    for(i = 0; i < 10; i ++)
-        callback(i);
+
+function a(){
+    return new Promise((resolve,reject) => {
+        reject({error :1});
+    })
+}
+async function b(){
+    var x = await a().catch(error => error);
+    console.log(x);
 }
 
-foo(10,(i) => {
-    console.log(i);
-})
-
+b()

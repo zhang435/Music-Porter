@@ -20,9 +20,15 @@
     "cheerio": "^1.0.0-rc.2",
     "crawler": "^1.1.2",
     "express": "^4.16.2",
+    "no": "0.0.1",
+    "nodemon": "^1.14.12",
     "querystring": "^0.2.0",
     "request": "^2.83.0",
+    "request-promise": "^4.2.2",
     "superagent": "^3.8.2",
     "utf8": "^3.0.0"
+  },
+  "devDependencies": {
+    "prettier": "1.10.2"
   }
 }
