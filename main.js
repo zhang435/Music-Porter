@@ -5,6 +5,7 @@ const querystring = require('querystring');
 const Spotify = require("./Spotifynew");
 const Xiami = require("./Xiami");
 const app = express();
+const account  =  require("./account")
 
 
 
@@ -47,6 +48,7 @@ app.get("/callback", (req, res) => {
         json: true
     }
     request.post(REQUEST_BODY_PARAMETER, (error, response, body) => {
+        res.setHeader("Content-Type", "application/json; charset=utf-8");
         callback(res,error, response, body)
     });
     })
@@ -56,25 +58,20 @@ async function callback(res,error, response, body) {
     var access_token  = body.access_token,
         refresh_token = body.refresh_token;
     
-    var username      = await Spotify.get_user_id(              access_token);
-    var _             = await Spotify.create_playlist(username, access_token);
-    var playlist_id   = await Spotify.get_playlist_id(username, access_token);
-    var arr = await Xiami.get_user_playlist("apple19950105@gmail.com", "apple19950105");
-    console.log("!!!!!");
-    console.log(arr);
+    var username      = await Spotify.get_user_id(              access_token).catch(error => console.log(error));
+    var _             = await Spotify.create_playlist(username, access_token).catch(error => console.log(error));
+    var xiami_data    = await Xiami.login(account.xiami_username,account.xiami_password).catch(error => console.log(error));
+    var total_page    = await Xiami.total_page(xiami_data).catch(error => console.log(error));
+    var playlist_id   = await Spotify.get_playlist_id(username, access_token).catch(error => console.log(error));
     
-    arr = await Spotify.get_songs_uri(arr,access_token);
-    res.write(JSON.stringify(arr.passed));
-    // Spotify.add(username,playlist_id,arr.passed,access_token);
-    // res.write(JSON.stringify({
-    //     access_token,
-    //     "success" : arr.passed,
-    //     "fail" : arr.fail
-    // }));
-    // var passed = arr.success,
-    //     fail    = arr.fail;
-    // console.log(passed);
-
+    for(var i = 1; i <= total_page;i ++){
+        var song_aritsts = await Xiami.fetch_page(xiami_data,i);
+        song_aritsts     = await Spotify.get_songs_uri(song_aritsts,access_token);
+        res.write(JSON.stringify(song_aritsts));
+        await Spotify.add(username,playlist_id,song_aritsts.passed,access_token);
+        // return;
+    }
+    
 }
 
 app.listen(8888);

@@ -3,17 +3,20 @@ const https = require("https")
 const querystring = require("querystring")
 const cheerio = require("cheerio")
 const suepragent = require("superagent")
+
 // reference from https://github.com/ovo4096/node-xiami-api/blob/master/src/crawler.js
 module.exports = {
   get_user_playlist,
   login,
-  generate_song_singer
+  generate_song_singer,
+  fetch_page,
+  total_page
 }
 
 async function get_user_playlist(username, password) {
   var palylist = await login("apple19950105@gmail.com", "apple19950105");
   // console.log(tmp);
-  return new Promise((resolve,reject) => {
+  return new Promise((resolve, reject) => {
     resolve(palylist);
   })
 }
@@ -80,24 +83,11 @@ async function login(username, password) {
           const id = parseInt(res.headers['set-cookie'][4].match(/user=(\d+)/)[1])
           const name = decodeURIComponent(res.headers['set-cookie'][4].match(/%22(.*?)%22/)[1])
           const userToken = res.headers['set-cookie'][3].split(" ")[0].replace("member_auth=", "").replace(";", "")
-          // const xiamiToken = res.headers['set-cookie'][1].match(/_xiamitoken=(\w+);/)[1]
-          // console.log(id,name,userToken,xiamiToken);
-          suepragent.get(`http://www.xiami.com/space/lib-song/u/${id}/page/1`)
-            .set('Cookie', `_xiamitoken=${xiamiToken}`, )
-            .end((error, res) => {
-              var total = total_page(res);
-              for (var i = 1; i <= 20; i++) {
-                suepragent.get(`http://www.xiami.com/space/lib-song/u/${id}/page/${i}`)
-                  .set('Cookie', `_xiamitoken=${xiamiToken}`, )
-                  .end((error, res) => {
-                    resolve(generate_song_singer(res));
-                  })
-              }
-            })
-          // resolve({
-          //   id,
-          //   name,
-          // })
+          resolve({
+            id,
+            name,
+            userToken
+          });
         })
       })
       req.on('error', (e) => {
@@ -110,16 +100,40 @@ async function login(username, password) {
   })
 }
 
-function total_page(res) {
+async function fetch_page(xiami, i) {
+  /**
+   * get the page ith songs
+   * fetch_page : string(xiami_userid) -> String -> int - Promise
+   */
+  return new Promise((resolve, reject) => {
+    suepragent.get(`http://www.xiami.com/space/lib-song/u/${xiami.id}/page/${i}`)
+      .set('Cookie', `_xiamitoken=${xiami.userToken}`, )
+      .end((error, res) => {
+        if(error)
+          reject(error);
+        resolve(generate_song_singer(res));
+      })
+  })
+}
+
+function total_page(xiami_data) {
   /**
    * total_page : return the total page for user_playlist , need to form the for loop
-   * String -> int
+   * {userid,username,xiamiotken} -> int
    */
+  return new Promise((resolve, reject) => {
+    suepragent.get(`http://www.xiami.com/space/lib-song/u/${xiami_data.id}/page/1`)
+      .set('Cookie', `_xiamitoken=${xiami_data.userToken}`, )
+      .end((error, res) => {
+        if(error)
+          reject(error);
+        var cheerio = require('cheerio'),
+          $ = cheerio.load(res.text);
+        resolve(Math.ceil(parseInt($('.all_page').find("span").text().replace("(第1页, 共", "").replace("条)", "")) / 25));
+      })
+  })
 
-  var cheerio = require('cheerio'),
-    $ = cheerio.load(res.text);
-  console.log("total pages : ", Math.ceil(parseInt($('.all_page').find("span").text().replace("(第1页, 共", "").replace("条)", "")) / 25))
-  return Math.ceil(parseInt($('.all_page').find("span").text().replace("(第1页, 共", "").replace("条)", "")) / 25);
+
 }
 
 function generate_song_singer(res) {
@@ -133,14 +147,16 @@ function generate_song_singer(res) {
   $(".song_name").each((i, element) => {
     var song = $(element).find("a").first().text();
     var singer = $(element).find(".artist_name").text();
-    song_singers.push([song,singer])
+    song_singers.push([song, singer])
   })
-  // console.log(song_singers);
-  // console.log(song_singers);
   return song_singers;
 }
 
+// async function test() {
+//   var data = await login("apple19950105@gmail.com", "apple19950105");
+//   var pages = await total_page(data);
+//   var songs = await fetch_page(data,1);
+//   console.log(songs,pages)
+// }
 
-// get_user_playlist("apple19950105@gmail.com", "apple19950105",(res)=>{
-//     console.log(res);
-// });
+// test()

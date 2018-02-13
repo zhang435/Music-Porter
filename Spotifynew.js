@@ -72,7 +72,7 @@ async function check_playlist(user_id, access_token) {
             .then(res => {
                 res.items.forEach(element => {
                     if (element.name === playlist_name)
-                        reject(false);
+                        resolve(false);
                 });
                 resolve(true);
             })
@@ -101,11 +101,15 @@ async function create_playlist(user_id, access_token) {
     };
     // resolve it the play not been created, otherwise return reject
     var bool = await check_playlist(user_id, access_token).catch(error => error);
-    if(bool){
-        rp(options)
-        .then(res => resolve())
-        .catch(error => {});
-    }
+    return new Promise((resolve,reject) => {
+        if(bool){
+            rp(options)
+            .then(res => resolve())
+            .catch(error => {});
+        }
+        resolve();
+    })
+
 }
 
 async function get_playlist_id(user_id, access_token) {
