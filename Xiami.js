@@ -151,12 +151,3 @@ function generate_song_singer(res) {
   })
   return song_singers;
 }
-
-// async function test() {
-//   var data = await login("apple19950105@gmail.com", "apple19950105");
-//   var pages = await total_page(data);
-//   var songs = await fetch_page(data,1);
-//   console.log(songs,pages)
-// }
-
-// test()

@@ -2,7 +2,7 @@ const express = require('express'); // Express web server framework
 const request = require('request'); // "Request" library
 const querystring = require('querystring');
 
-const Spotify = require("./Spotifynew");
+const Spotify = require("./Spotify");
 const Xiami = require("./Xiami");
 const app = express();
 const account  =  require("./account")
