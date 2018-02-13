@@ -1,5 +1,5 @@
 
-# pretty close to finish up everything , if you want to use it now, you can create a file named "account.js" with content# transform music 
+# pretty close to finish up everything , if you want to use it now, you can create a file named "account.js" with content:
 ```javascript
 const xiami_username  = "your_username";
 const xiami_password  = "your_password";
@@ -9,9 +9,10 @@ module.exports = {
 }
 ```
 
-then run 
 \> node main.js
-#form xiami to spotify implemented with nodejs
+
+
+# From xiami to spotify implemented with Node.js
 
 
 
