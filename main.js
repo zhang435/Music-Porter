@@ -3,6 +3,7 @@ const request = require('request'); // "Request" library
 const querystring = require('querystring');
 const hbs = require("hbs");
 const app = express();
+const port = process.env.PORT || 8888;
 
 const Spotify = require("./Spotify");
 const Xiami = require("./Xiami");
