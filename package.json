@@ -17,9 +17,11 @@
   },
   "homepage": "https://github.com/zhang435/Xiami_To_Spotify#readme",
   "dependencies": {
+    "body-parser": "^1.18.2",
     "cheerio": "^1.0.0-rc.2",
     "crawler": "^1.1.2",
     "express": "^4.16.2",
+    "hbs": "^4.0.1",
     "no": "0.0.1",
     "nodemon": "^1.14.12",
     "querystring": "^0.2.0",
