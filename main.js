@@ -1,17 +1,25 @@
 const express = require('express'); // Express web server framework
 const request = require('request'); // "Request" library
 const querystring = require('querystring');
+const hbs = require("hbs");
+const app = express();
 
 const Spotify = require("./Spotify");
 const Xiami = require("./Xiami");
-const app = express();
-const account  =  require("./account")
+const account = require("./account")
 
 
+var bodyParser = require('body-parser')
+app.use(bodyParser.json()); // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
+    extended: true
+}));
 
-app.get("/login", (req, res) => {
+////////////////////////////////////////////////////////////////////////////////////////////////////////////  
+
+app.get("/", (req, res) => {
     /**
-     * @param  {} nothing
+     * @param  {} when user first get into the page, go thorugh the auth process
      * @return {promise} 
      */
     var url = 'https://accounts.spotify.com/authorize?';
@@ -48,30 +56,36 @@ app.get("/callback", (req, res) => {
         json: true
     }
     request.post(REQUEST_BODY_PARAMETER, (error, response, body) => {
-        res.setHeader("Content-Type", "application/json; charset=utf-8");
-        callback(res,error, response, body)
+        res.render("index.hbs", {
+            access_token: body.access_token
+        })
     });
-    })
+})
+
+app.post("/xiami", (req, res) => {
+    const xiami_username = req.body.username;
+    const xiami_password = req.body.password;
+    const spotify_access_token = req.body.spotify_access_token;
+
+    callback(xiami_username, xiami_password, spotify_access_token, res);
+})
 
 
-async function callback(res,error, response, body) {
-    var access_token  = body.access_token,
-        refresh_token = body.refresh_token;
-    
-    var username      = await Spotify.get_user_id(              access_token).catch(error => console.log(error));
-    var _             = await Spotify.create_playlist(username, access_token).catch(error => console.log(error));
-    var xiami_data    = await Xiami.login(account.xiami_username,account.xiami_password).catch(error => console.log(error));
-    var total_page    = await Xiami.total_page(xiami_data).catch(error => console.log(error));
-    var playlist_id   = await Spotify.get_playlist_id(username, access_token).catch(error => console.log(error));
-    
-    for(var i = 1; i <= total_page;i ++){
-        var song_aritsts = await Xiami.fetch_page(xiami_data,i);
-        song_aritsts     = await Spotify.get_songs_uri(song_aritsts,access_token);
+async function callback(xiami_username, xiami_password, access_token, res) {
+
+    var username = await Spotify.get_user_id(access_token).catch(error => console.log(error));
+    var _ = await Spotify.create_playlist(username, access_token).catch(error => console.log(error));
+    var xiami_data = await Xiami.login(xiami_username, xiami_password).catch(error => console.log(error));
+    var total_page = await Xiami.total_page(xiami_data).catch(error => console.log(error));
+    var playlist_id = await Spotify.get_playlist_id(username, access_token).catch(error => console.log(error));
+    res.setHeader("Content-Type", "application/json; charset=utf-8");
+    for (var i = 1; i <= total_page; i++) {
+        var song_aritsts = await Xiami.fetch_page(xiami_data, i);
+        song_aritsts = await Spotify.get_songs_uri(song_aritsts, access_token);
         res.write(JSON.stringify(song_aritsts));
-        await Spotify.add(username,playlist_id,song_aritsts.passed,access_token);
-        // return;
+        await Spotify.add(username, playlist_id, song_aritsts.passed, access_token);
     }
-    
+
 }
 
 app.listen(8888);
