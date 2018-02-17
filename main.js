@@ -7,7 +7,7 @@ const port = process.env.PORT || 8888;
 
 const Spotify = require("./Spotify");
 const Xiami = require("./Xiami");
-const account = require("./account")
+// const account = require("./account")
 
 
 var bodyParser = require('body-parser')
