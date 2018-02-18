@@ -1,7 +1,5 @@
-
 # From Xiami to Spotify implemented with Node.js
-
-
+![\](https://upload-images.jianshu.io/upload_images/4457561-dd78853d4dfed3ed.png)](https://upload-images.jianshu.io/upload_images/4457561-dd78853d4dfed3ed.png)
 If you have trouble to bring your music from Xiami into Spotify, this should be the application you looking for.
 This applicatoin is in purpose of help people to tranfer private palylist from xiami to Spotify. super useful for student who study in US and use Xiami back in mainlnad China
 [Start Use Xiami  to Spotify by click this link](https://still-brushlands-47642.herokuapp.com/)
@@ -12,6 +10,9 @@ this is a Node.js web app that in purpose of adding songs from [Xiami music appl
 
 Trace of this can be describe as:
 [Spotify access](https://developer.spotify.com/web-api/authorization-guide/) -> [xiami login](http://www.xiami.com/) -> add song page by page into Spotify
+
+
+[Viedo tutorial](https://youtu.be/gtFL4aW6IWc)
 
 ### Requirement
 ---------
