@@ -1,49 +1,37 @@
 
-# pretty close to finish up everything , if you want to use it now, you can create a file named "account.js" with content:
-```javascript
-const xiami_username  = "your_username";
-const xiami_password  = "your_password";
-module.exports = {
-    xiami_username,
-    xiami_password
-}
-```
-
-\> node main.js
+# From Xiami to Spotify implemented with Node.js
 
 
-# From xiami to spotify implemented with Node.js
+If you have trouble to bring your music from Xiami into Spotify, this should be the application you looking for.
+This applicatoin is in purpose of help people to tranfer private palylist from xiami to Spotify. super useful for student who study in US and use Xiami back in mainlnad China
+[Start Use Xiami  to Spotify by click this link](https://still-brushlands-47642.herokuapp.com/)
 
+### Introducation
+---------
+this is a Node.js web app that in purpose of adding songs from [Xiami music application](https://www.xiami.com) to [Spotify](www.spotify.com)
 
-
-
-this is a "web app" that in purpose of transfer music from Xiami Playlist to Spotify
-This is really useful for whoever study abroad and would like to integrate music into Spotify.
-
-###Introducation
-    this is a Node.js that in purpose of adding songs from [Xiami music application](https://www.xiami.com) to [Spotify](www.spotify.com)
-
-    Trace of this can be describe as:
-        Xiami Login -> (FOR ALL i `(total pages in xiami playlist)` Xiami song fetch at ith page -> SPotify API access -> create palylist -> add ith songs fetch from Xiami to playlist)
-
-    Use my own data as reference, I am able to transfer 657/1300 from Xiami to Spotify.
-    All the songs will be added into a folder named "tmp", you can change it after process finish.
+Trace of this can be describe as:
+[Spotify access](https://developer.spotify.com/web-api/authorization-guide/) -> [xiami login](http://www.xiami.com/) -> add song page by page into Spotify
 
 ### Requirement
-    knowing your Spotify account
-    knowing your Xiami   account
+---------
+knowing your Spotify account
+knowing your Xiami   account
+
+**_Warning : I did not implment any error handling, So if somehow you have wrong username/password, it not going to show any valid message, so make sure your password is correct._**
+
+### Rate
+---------
+Use my own data as reference, I am able to transfer 657/1300 from Xiami to Spotify.
+All the songs will be added into a folder named "tmp", you can change it AFTER process finish.
+**_Warning: if you change name during the process it mind break the program_**
+
 
 
 ### Reference
-    [Spotify API](https://developer.spotify.com/web-api/)
-    [Xiami access]( https://github.com/ovo4096/node-xiami-api/blob/master/src/crawler.js)
-    [Node.js](https://nodejs.org/en/)
+[Spotify API](https://developer.spotify.com/web-api/)
+[Xiami access]( https://github.com/ovo4096/node-xiami-api/blob/master/src/crawler.js)
+[Node.js](https://nodejs.org/en/)
 
-### Improvement
-    There are many things we can do to improve the transfer rate. song tracks just not exist in SPotify, 
-    there is nothing we can do about it, while, there are songs like:
-    SONGNAME (Live) by XXX => wont find it unless we remove (Live)
-    SONGNAME by XXX & XXX => we can find the song if we only search one artist
-    Some chinese singer store in spotify with their Cantonese name, which may able to find by replace from simplifed to trditional
-    
-    Feel free to change/improve this!
+### Other
+feel free to extend the application, indeed ,I would happy if someone can make some css design for the page.
