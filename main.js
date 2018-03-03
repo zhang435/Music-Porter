@@ -73,10 +73,15 @@ app.post("/xiami", (req, res) => {
 
 
 async function callback(xiami_username, xiami_password, access_token, res) {
-
+    // check if xiami user been successfully login, return some useful error message if not
+    var xiami_data = await Xiami.login(xiami_username, xiami_password).catch(error => error);
+    // res.write(JSON.stringify(xiami_data));
+    if ("error" in xiami_data)
+        res.send(xiami_data.error);
+    
+    
     var username = await Spotify.get_user_id(access_token).catch(error => console.log(error));
     var _ = await Spotify.create_playlist(username, access_token).catch(error => console.log(error));
-    var xiami_data = await Xiami.login(xiami_username, xiami_password).catch(error => console.log(error));
     var total_page = await Xiami.total_page(xiami_data).catch(error => console.log(error));
     var playlist_id = await Spotify.get_playlist_id(username, access_token).catch(error => console.log(error));
     res.setHeader("Content-Type", "application/json; charset=utf-8");

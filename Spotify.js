@@ -7,6 +7,8 @@ var querystring = require('querystring');
 const CLIENT_ID = 'c778e8173793481c907f2ee677fdf578'; // Your client id
 const CLIENT_SECRET = '3d5d8daa997a4b29b11100d55b018ad2'; // Your secret
 const url = "https://still-brushlands-47642.herokuapp.com/"
+// const url = "http://localhost:8888/"
+
 const REDIRECT_URI = url + "callback"; // Your redirect uri
 const SCOPE = 'playlist-modify-public playlist-read-collaborative playlist-modify-private'
 const playlist_name = "tmp"
@@ -45,10 +47,12 @@ async function get_user_id(access_token) {
                 if (body.id)
                     resolve(body.id)
                 reject({
-                    messgae : "Unable to get user id"
+                    messgae: "Unable to get user id"
                 })
             }).catch(error => {
-                reject({error});
+                reject({
+                    error
+                });
             });
     })
 }
@@ -102,11 +106,11 @@ async function create_playlist(user_id, access_token) {
     };
     // resolve it the play not been created, otherwise return reject
     var bool = await check_playlist(user_id, access_token).catch(error => error);
-    return new Promise((resolve,reject) => {
-        if(bool){
+    return new Promise((resolve, reject) => {
+        if (bool) {
             rp(options)
-            .then(res => resolve())
-            .catch(error => {});
+                .then(res => resolve())
+                .catch(error => {});
         }
         resolve();
     })
@@ -430,7 +434,7 @@ var access_token = "BQBWdMgpWXsqkZvHLkvxf_RSpWNdmKgAvw9sZ6-LwIR6Nb54bVlellgo3VeM
 //         print("error during get playlist")
 //         return
 //     }
-        
+
 //     print(playlist);
 //     var arr = await get_songs_uri(test_data, access_token).catch(error => console.log(error));
 

@@ -3,22 +3,14 @@ const https = require("https")
 const querystring = require("querystring")
 const cheerio = require("cheerio")
 const suepragent = require("superagent")
-
+// const account = require("./account")
 // reference from https://github.com/ovo4096/node-xiami-api/blob/master/src/crawler.js
 module.exports = {
-  get_user_playlist,
+  // get_user_playlist,
   login,
   generate_song_singer,
   fetch_page,
   total_page
-}
-
-async function get_user_playlist(username, password) {
-  var palylist = await login("apple19950105@gmail.com", "apple19950105");
-  // console.log(tmp);
-  return new Promise((resolve, reject) => {
-    resolve(palylist);
-  })
 }
 
 
@@ -65,7 +57,7 @@ async function login(username, password) {
         }
         if (error) {
           res.resume()
-          reject(error)
+          reject({error})
         }
 
         res.setEncoding('utf8')
@@ -76,7 +68,7 @@ async function login(username, password) {
         res.on('end', () => {
           const parsedData = JSON.parse(rawData)
           if (!parsedData.status) {
-            reject(new Error(parsedData.msg))
+            reject({"error" :parsedData.msg})
             return
           }
 
@@ -91,11 +83,11 @@ async function login(username, password) {
         })
       })
       req.on('error', (e) => {
-        reject(e)
+        reject({"error":e})
       })
       req.end(postData)
     }).on('error', (e) => {
-      reject(e)
+      reject({'error' : e})
     })
   })
 }
@@ -109,8 +101,8 @@ async function fetch_page(xiami, i) {
     suepragent.get(`http://www.xiami.com/space/lib-song/u/${xiami.id}/page/${i}`)
       .set('Cookie', `_xiamitoken=${xiami.userToken}`, )
       .end((error, res) => {
-        if(error)
-          reject(error);
+        if (error)
+          reject({error});
         resolve(generate_song_singer(res));
       })
   })
@@ -125,8 +117,8 @@ function total_page(xiami_data) {
     suepragent.get(`http://www.xiami.com/space/lib-song/u/${xiami_data.id}/page/1`)
       .set('Cookie', `_xiamitoken=${xiami_data.userToken}`, )
       .end((error, res) => {
-        if(error)
-          reject(error);
+        if (error)
+          reject({error});
         var cheerio = require('cheerio'),
           $ = cheerio.load(res.text);
         resolve(Math.ceil(parseInt($('.all_page').find("span").text().replace("(第1页, 共", "").replace("条)", "")) / 25));
@@ -151,3 +143,5 @@ function generate_song_singer(res) {
   })
   return song_singers;
 }
+
+// get_user_playlist("","");
