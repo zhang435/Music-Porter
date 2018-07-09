@@ -3,6 +3,7 @@ const https = require("https")
 const querystring = require("querystring")
 const cheerio = require("cheerio")
 const suepragent = require("superagent")
+const tmp = require("NeteaseCloudMusicApi")
 // const account = require("./account")
 // reference from https://github.com/ovo4096/node-xiami-api/blob/master/src/crawler.js
 module.exports = {
