@@ -7,6 +7,7 @@ const port = process.env.PORT || 8888;
 
 const Spotify = require("./Spotify");
 const Xiami = require("./Xiami");
+const Netease = require("./NetEaseCloudMusic");
 // const account = require("./account")
 
 
@@ -33,8 +34,6 @@ app.get("/", (req, res) => {
     }
     res.redirect(url + querystring.stringify(QUERY_PARAMETER))
 })
-
-
 
 app.get("/callback", (req, res) => {
     var code = req.query.code || null;
@@ -64,22 +63,32 @@ app.get("/callback", (req, res) => {
 })
 
 app.post("/xiami", (req, res) => {
-    const xiami_username = req.body.username;
-    const xiami_password = req.body.password;
-    const spotify_access_token = req.body.spotify_access_token;
+    const xiami_username = req.body.XiamiUsername;
+    const xiami_password = req.body.XiamiPassword;
+    const spotify_access_token = req.body.spotifyAccessToken;
 
-    callback(xiami_username, xiami_password, spotify_access_token, res);
+    xiamiprocess(xiami_username, xiami_password, spotify_access_token, res);
 })
 
 
-async function callback(xiami_username, xiami_password, access_token, res) {
+app.post("/netEaseCloudMusic", (req, res) => {
+    const spotify_access_token = req.body.spotify_access_token;
+    const netEaseCloudMuiscUrl = req.body.playlistUrl;
+
+
+    neteaseprocess(spotify_access_token, netEaseCloudMuiscUrl, res);
+
+})
+
+
+async function xiamiprocess(xiami_username, xiami_password, access_token, res) {
     // check if xiami user been successfully login, return some useful error message if not
     var xiami_data = await Xiami.login(xiami_username, xiami_password).catch(error => error);
     // res.write(JSON.stringify(xiami_data));
     if ("error" in xiami_data)
         res.send(xiami_data.error);
-    
-    
+
+
     var username = await Spotify.get_user_id(access_token).catch(error => console.log(error));
     var _ = await Spotify.create_playlist(username, access_token).catch(error => console.log(error));
     var total_page = await Xiami.total_page(xiami_data).catch(error => console.log(error));
@@ -91,6 +100,18 @@ async function callback(xiami_username, xiami_password, access_token, res) {
         res.write(JSON.stringify(song_aritsts));
         await Spotify.add(username, playlist_id, song_aritsts.passed, access_token);
     }
+
+}
+
+async function neteaseprocess(spotify_access_token, netEaseCloudMuiscUrl, res) {
+    var username = await Spotify.get_user_id(spotify_access_token).catch(error => console.log(error));
+    var _ = await Spotify.create_playlist(username, spotify_access_token).catch(error => console.log(error));
+    var playlist_id = await Spotify.get_playlist_id(username, spotify_access_token).catch(error => console.log(error));
+    var song_aritsts = await Netease.generate_song_singer(netEaseCloudMuiscUrl).catch(err => console.log(err));
+    song_aritsts = await Spotify.get_songs_uri(song_aritsts, spotify_access_token);
+    res.setHeader("Content-Type", "application/json; charset=utf-8");
+    res.write(JSON.stringify(song_aritsts));
+    await Spotify.add(username, playlist_id, song_aritsts.passed, spotify_access_token);
 
 }
 

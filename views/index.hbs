@@ -3,18 +3,32 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Xiami to Spotify</title>
+    <title>Xiami / NetEaseCLoudMusic to Spotify</title>
 </head>
 
 <body>
     <p>
+        Xiami user: plase use this line
     </p>
-    <form action="/xiami" method="post">
-        <input type="input" name="username" placeholder="xiami username">
-        <input type="input" name="password" placeholder="xiami password">
-        <input type="hidden" name="spotify_access_token" value={{access_token}}>
-        <input type="submit" value="Submit">
-    </form>
+    <div>
+        <form action="/xiami" method="post">
+            <input type="input" name="XiamiUsername" placeholder="xiami username" required>
+            <input type="input" name="XiamiPassword" placeholder="xiami password" required>
+            <input type="hidden" name="spotifyAccessToken" value={{access_token}}>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+    <p>NetEaseCloudMusic user , please use this one,go to the playlist you want to transfer, paste it here, ans then submit
+    </p>
+    <div>
+        <form action="/netEaseCloudMusic" method="post">
+            <input type="input" name="playlistUrl" size="40" placeholder="netEaseCloudMusic PlayListUrl" required>
+            <input type="hidden" name="spotify_access_token" value={{access_token}}>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+
+
 </body>
 
 </html>
