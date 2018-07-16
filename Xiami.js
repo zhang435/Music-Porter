@@ -57,7 +57,9 @@ async function login(username, password) {
         }
         if (error) {
           res.resume()
-          reject({error})
+          reject({
+            error
+          })
         }
 
         res.setEncoding('utf8')
@@ -68,7 +70,9 @@ async function login(username, password) {
         res.on('end', () => {
           const parsedData = JSON.parse(rawData)
           if (!parsedData.status) {
-            reject({"error" :parsedData.msg})
+            reject({
+              "error": parsedData.msg
+            })
             return
           }
 
@@ -83,11 +87,15 @@ async function login(username, password) {
         })
       })
       req.on('error', (e) => {
-        reject({"error":e})
+        reject({
+          "error": e
+        })
       })
       req.end(postData)
     }).on('error', (e) => {
-      reject({'error' : e})
+      reject({
+        'error': e
+      })
     })
   })
 }
@@ -102,7 +110,9 @@ async function fetch_page(xiami, i) {
       .set('Cookie', `_xiamitoken=${xiami.userToken}`, )
       .end((error, res) => {
         if (error)
-          reject({error});
+          reject({
+            error
+          });
         resolve(generate_song_singer(res));
       })
   })
@@ -118,7 +128,9 @@ function total_page(xiami_data) {
       .set('Cookie', `_xiamitoken=${xiami_data.userToken}`, )
       .end((error, res) => {
         if (error)
-          reject({error});
+          reject({
+            error
+          });
         var cheerio = require('cheerio'),
           $ = cheerio.load(res.text);
         resolve(Math.ceil(parseInt($('.all_page').find("span").text().replace("(第1页, 共", "").replace("条)", "")) / 25));
