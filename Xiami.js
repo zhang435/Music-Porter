@@ -131,8 +131,7 @@ function total_page(xiami_data) {
           reject({
             error
           });
-        var cheerio = require('cheerio'),
-          $ = cheerio.load(res.text);
+        $ = cheerio.load(res.text);
         resolve(Math.ceil(parseInt($('.all_page').find("span").text().replace("(第1页, 共", "").replace("条)", "")) / 25));
       })
   })

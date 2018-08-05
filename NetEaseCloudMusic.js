@@ -87,15 +87,20 @@ async function getSongSingerFromProfilePage(link) {
  * this should be the only entrance for the netEaseMusic
  * @param {*} link to thr palylist
  */
-async function generate_song_singer(link) {
+async function generate_song_singer(link, res) {
     link = link.replace("/#/", "/");
     var profiles = await get_song_profile(link).catch(error => console.log(error));
     var song_aritsts = new Array();
+    res.write("<h1>Fetching songs from NetEaseMusic: " + link + " : </h1>" + "\n");
     for (var i = 0; i < profiles.length; i++) {
         var song_singer = await getSongSingerFromProfilePage(profiles[i]).catch(err => console.log(err));
         console.log(song_singer);
+        res.write((i + 1) + ", " + song_singer.toString() + "</br>");
         song_aritsts.push(song_singer);
     }
+
+    res.write("<h1>search fetched songs in Spotify</h1>");
+
     return new Promise((resolve, rej) => {
         resolve(song_aritsts);
         rej("can not get song singerls")

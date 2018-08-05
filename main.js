@@ -66,7 +66,7 @@ app.post("/xiami", (req, res) => {
     const xiami_username = req.body.XiamiUsername;
     const xiami_password = req.body.XiamiPassword;
     const spotify_access_token = req.body.spotifyAccessToken;
-
+    res.setHeader("Content-Type", "application/json; charset=utf-8");
     xiamiprocess(xiami_username, xiami_password, spotify_access_token, res);
 })
 
@@ -74,10 +74,8 @@ app.post("/xiami", (req, res) => {
 app.post("/netEaseCloudMusic", (req, res) => {
     const spotify_access_token = req.body.spotify_access_token;
     const netEaseCloudMuiscUrl = req.body.playlistUrl;
-
-
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
     neteaseprocess(spotify_access_token, netEaseCloudMuiscUrl, res);
-
 })
 
 
@@ -93,26 +91,33 @@ async function xiamiprocess(xiami_username, xiami_password, access_token, res) {
     var _ = await Spotify.create_playlist(username, access_token).catch(error => console.log(error));
     var total_page = await Xiami.total_page(xiami_data).catch(error => console.log(error));
     var playlist_id = await Spotify.get_playlist_id(username, access_token).catch(error => console.log(error));
-    res.setHeader("Content-Type", "application/json; charset=utf-8");
+
     for (var i = 1; i <= total_page; i++) {
         var song_aritsts = await Xiami.fetch_page(xiami_data, i);
         song_aritsts = await Spotify.get_songs_uri(song_aritsts, access_token);
         res.write(JSON.stringify(song_aritsts));
         await Spotify.add(username, playlist_id, song_aritsts.passed, access_token);
     }
-
+    res.end("<h1> done,check 'tmp' in Spotify</h1>");
 }
 
 async function neteaseprocess(spotify_access_token, netEaseCloudMuiscUrl, res) {
     var username = await Spotify.get_user_id(spotify_access_token).catch(error => console.log(error));
     var _ = await Spotify.create_playlist(username, spotify_access_token).catch(error => console.log(error));
+    var song_aritsts = await Netease.generate_song_singer(netEaseCloudMuiscUrl, res).catch(err => console.log(err));
     var playlist_id = await Spotify.get_playlist_id(username, spotify_access_token).catch(error => console.log(error));
-    var song_aritsts = await Netease.generate_song_singer(netEaseCloudMuiscUrl).catch(err => console.log(err));
-    song_aritsts = await Spotify.get_songs_uri(song_aritsts, spotify_access_token);
-    res.setHeader("Content-Type", "application/json; charset=utf-8");
-    res.write(JSON.stringify(song_aritsts));
-    await Spotify.add(username, playlist_id, song_aritsts.passed, spotify_access_token);
 
+    // split search from whole to part, so that usre can track the process
+    var chunk = 5;
+    for (var i = 0; i < song_aritsts.length; i += chunk) {
+        var part = song_aritsts.slice(i, i + chunk);
+        part = await Spotify.get_songs_uri(part, spotify_access_token);
+        res.write(JSON.stringify(part));
+        await Spotify.add(username, playlist_id, part.passed, spotify_access_token).catch(error => console.log(error));
+    }
+
+
+    res.end("<h1> done,check 'tmp' in Spotify</h1>");
 }
 
 app.listen(port);
