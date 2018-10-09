@@ -1,5 +1,7 @@
 # Music Porter
 
+## Note Xiami site is nolonger avaliable becuase of the new slide verfication login for xiami site, So far I do not have time to find a way to go through it, Please make a PR if you are able to implement this or create issue if you know the solution.
+
 ### From Xiami/NetEaseCloudMusic to Spotify implemented with Node.js
 
 ![](https://upload-images.jianshu.io/upload_images/4457561-ef588ad60e2dae00.png)
