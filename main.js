@@ -63,11 +63,10 @@ app.get("/callback", (req, res) => {
 })
 
 app.post("/xiami", (req, res) => {
-    const xiami_username = req.body.XiamiUsername;
-    const xiami_password = req.body.XiamiPassword;
+    const playlist_url = req.body.playlist_url;
     const spotify_access_token = req.body.spotifyAccessToken;
     res.setHeader("Content-Type", "application/json; charset=utf-8");
-    xiamiprocess(xiami_username, xiami_password, spotify_access_token, res);
+    xiamiprocess(playlist_url, spotify_access_token, res);
 })
 
 
@@ -79,24 +78,20 @@ app.post("/netEaseCloudMusic", (req, res) => {
 })
 
 
-async function xiamiprocess(xiami_username, xiami_password, access_token, res) {
-    // check if xiami user been successfully login, return some useful error message if not
-    var xiami_data = await Xiami.login(xiami_username, xiami_password).catch(error => error);
-    // res.write(JSON.stringify(xiami_data));
-    if ("error" in xiami_data)
-        res.send(xiami_data.error);
 
-
-    var username = await Spotify.get_user_id(access_token).catch(error => console.log(error));
-    var _ = await Spotify.create_playlist(username, access_token).catch(error => console.log(error));
-    var total_page = await Xiami.total_page(xiami_data).catch(error => console.log(error));
-    var playlist_id = await Spotify.get_playlist_id(username, access_token).catch(error => console.log(error));
+async function xiamiprocess(ls_url, spotify_access_token, res) {
+    var _xiami_access_token = await Xiami.fetch_xiami_token().catch("error during access _xiami_access_token");
+    if ("error" in _xiami_access_token) {
+        res.send(_xiami_access_token);
+        return;
+    }
+    var sp = Spotify.Spotify();
 
     for (var i = 1; i <= total_page; i++) {
         var song_aritsts = await Xiami.fetch_page(xiami_data, i);
-        song_aritsts = await Spotify.get_songs_uri(song_aritsts, access_token);
+        song_aritsts = await Spotify.get_songs_uri(song_aritsts, spotify_access_token);
         res.write(JSON.stringify(song_aritsts));
-        await Spotify.add(username, playlist_id, song_aritsts.passed, access_token);
+        await Spotify.add(sp.username, sp.playlist_id, song_aritsts.passed, spotify_access_token);
     }
     res.end("<h1> done,check 'tmp' in Spotify</h1>");
 }

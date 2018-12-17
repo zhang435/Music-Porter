@@ -26,6 +26,7 @@ module.exports = {
     get_playlist_id,
     get_songs_uri,
     add,
+    Spotify
 }
 
 async function get_user_id(access_token) {
@@ -281,4 +282,21 @@ async function add(user_id, playlist_id, arr, access_token) {
     rp(options)
         .then(body => {})
         .catch(error => error)
+}
+
+/**
+ * the main function for spotify.js, main function only need to call this function to generate all necessary information about spotify
+ * @param {*} access_token spotify access token
+ */
+async function Spotify(access_token) {
+    var username = await Spotify.get_user_id(access_token).catch(error => console.log(error));
+    var _ = await Spotify.create_playlist(username, access_token).catch(error => console.log(error));
+    var total_page = await Xiami.total_page(xiami_data).catch(error => console.log(error));
+    var playlist_id = await Spotify.get_playlist_id(username, access_token).catch(error => console.log(error));
+
+    return {
+        username,
+        total_page,
+        playlist_id
+    };
 }

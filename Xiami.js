@@ -1,158 +1,124 @@
-const http = require("http")
-const https = require("https")
-const querystring = require("querystring")
 const cheerio = require("cheerio")
 const suepragent = require("superagent")
-// const account = require("./account")
-// reference from https://github.com/ovo4096/node-xiami-api/blob/master/src/crawler.js
+const rp = require("request-promise");
+const _ = require('lodash');
+
 module.exports = {
-  // get_user_playlist,
-  login,
-  generate_song_singer,
-  fetch_page,
-  total_page
+    fetch_xiami_token,
+    extract_url,
+
+    fetch_page,
+    generate_song_singer,
+
 }
 
+/**
+ * Xiami.js mainly handle the job for user to acess the xiami account and featch the playlist contents
 
-async function login(username, password) {
-  return new Promise((resolve, reject) => {
-    https.get('https://login.xiami.com/member/login', (res) => {
-      const {
-        statusCode
-      } = res
+ */
+/**
+ * _include_headers: this method will able rp to return whole http reponse instead of just body content
+ * @param {*} html content from request 
+ * @param {*} response http response
+ * @param {*} resolveWithFullResponse  None
+ */
+const _include_headers = function (body, response, resolveWithFullResponse) {
+    return {
+        'headers': response.headers,
+        'data': body
+    };
+};
+/**
+ * fetch_xiami_token: send a request to the login page, which will send back a xiami access token for login
+ */
+async function fetch_xiami_token() {
+    var options = {
+        method: 'GET',
+        uri: "https://login.xiami.com/member/login",
+        transform: _include_headers,
+    };
 
-      let error
-      if (statusCode !== 200) {
-        error = new Error(`Request Failed.\nStatus Code: ${statusCode}`)
-      }
-
-      const xiamiToken = res.headers['set-cookie'][1].match(/_xiamitoken=(\w+);/)[1]
-      res.resume()
-
-      const postData = querystring.stringify({
-        '_xiamitoken': xiamiToken,
-        'account': username,
-        'pw': password
-      })
-      const options = {
-        hostname: 'login.xiami.com',
-        path: '/passport/login',
-        method: 'POST',
-        headers: {
-          'Referer': 'https://login.xiami.com/member/login',
-          'Cookie': `_xiamitoken=${xiamiToken}`,
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
-      }
-
-      const req = https.request(options, (res) => {
-        const {
-          statusCode
-        } = res
-        //   console.log(res)  
-
-        let error
-        if (statusCode !== 200) {
-          error = new Error(`Request Failed.\nStatus Code: ${statusCode}`)
-        }
-        if (error) {
-          res.resume()
-          reject({
-            error
-          })
-        }
-
-        res.setEncoding('utf8')
-        let rawData = ''
-        res.on('data', (chunk) => {
-          rawData += chunk
-        })
-        res.on('end', () => {
-          const parsedData = JSON.parse(rawData)
-          if (!parsedData.status) {
-            reject({
-              "error": parsedData.msg
+    return new Promise((resolve, reject) => {
+        rp(options)
+            .then((response) => {
+                // console.log(response.headers['set-cookie'])
+                resolve(response.headers['set-cookie'][2].match(/_xiamitoken=(\w+);/)[1])
             })
-            return
-          }
+            .catch((error) => {
+                reject("unable to get the page", options.uri)
+            })
+    });
+}
 
-          const id = parseInt(res.headers['set-cookie'][4].match(/user=(\d+)/)[1])
-          const name = decodeURIComponent(res.headers['set-cookie'][4].match(/%22(.*?)%22/)[1])
-          const userToken = res.headers['set-cookie'][3].split(" ")[0].replace("member_auth=", "").replace(";", "")
-          resolve({
-            id,
-            name,
-            userToken
-          });
-        })
-      })
-      req.on('error', (e) => {
-        reject({
-          "error": e
-        })
-      })
-      req.end(postData)
-    }).on('error', (e) => {
-      reject({
-        'error': e
-      })
+/**
+ * 
+ * @param {*} url http url for the user playlist
+ */
+function extract_url(url) {
+    /**
+     * extract user_id,page_num,spm_code from url
+     * @param url String : xiami playlist url
+     * @returns {user_id String, spm_code String}
+     */
+    var contents = _.split(url, "/")
+    return {
+        "user_id": contents[6],
+        "spm_code": _.split(contents[8], "spm=")[1]
+    }
+}
+
+// console.log(extract_url("https://www.xiami.com/space/lib-song/u/18313828/page/2?spm=a1z1s.6928797.1561534521.379.LLLU4M"))
+/**
+ * feach the coeresponding playlist page of user
+ * @param {dict} user_info 
+ * @param {int} page_num the page num of my playlist
+ * @param {String} _xiami_token get access token for the user
+ */
+async function fetch_page(user_info, page_num, _xiami_token) {
+    var standard_url = `http://www.xiami.com/space/lib-song/u/${user_info.user_id}/page/${page_num}`;
+    console.log(standard_url);
+    return new Promise((resolve, reject) => {
+        suepragent.get(standard_url)
+            .set('Cookie', `_xiamitoken=${_xiami_token}`, )
+            .end((error, res) => {
+                if (error)
+                    reject("unable to load page ", );
+                resolve(res);
+            })
     })
-  })
 }
 
-async function fetch_page(xiami, i) {
-  /**
-   * get the page ith songs
-   * fetch_page : string(xiami_userid) -> String -> int - Promise
-   */
-  return new Promise((resolve, reject) => {
-    suepragent.get(`http://www.xiami.com/space/lib-song/u/${xiami.id}/page/${i}`)
-      .set('Cookie', `_xiamitoken=${xiami.userToken}`, )
-      .end((error, res) => {
-        if (error)
-          reject({
-            error
-          });
-        resolve(generate_song_singer(res));
-      })
-  })
+/**
+ * extract the sgong singer content from paylist table base on the html content send from the fetch_page
+ * @param {*} content html page
+ * @returns {String, String} {song, singer}
+ */
+async function generate_song_singer(content) {
+    /**
+     * generate_song_singer : iteriate the whole userplaylist to get the data from Xiami
+     * Stirng -> {song @String : singer @String }
+     */
+    var song_singers = Array();
+    $ = cheerio.load(content.text);
+    $(".song_name").each((i, element) => {
+        var song = $(element).find("a").first().text();
+        var singer = $(element).find(".artist_name").text();
+        song_singers.push([song, singer])
+    })
+    return song_singers;
 }
 
-function total_page(xiami_data) {
-  /**
-   * total_page : return the total page for user_playlist , need to form the for loop
-   * {userid,username,xiamiotken} -> int
-   */
-  return new Promise((resolve, reject) => {
-    suepragent.get(`http://www.xiami.com/space/lib-song/u/${xiami_data.id}/page/1`)
-      .set('Cookie', `_xiamitoken=${xiami_data.userToken}`, )
-      .end((error, res) => {
-        if (error)
-          reject({
-            error
-          });
-        $ = cheerio.load(res.text);
-        resolve(Math.ceil(parseInt($('.all_page').find("span").text().replace("(第1页, 共", "").replace("条)", "")) / 25));
-      })
-  })
 
+(async function tmp() {
+
+    console.log(_xiami_token);
+    infos = extract_url("https://www.xiami.com/space/lib-song/u/18313828/page/2?spm=a1z1s.6928797.1561534521.379.ljG2QD");
+    var res = await fetch_page(infos, 1, _xiami_token).catch(error => error);
+    console.log(generate_song_singer(res));
+})();
+
+async function Xiami(infos) {
+    var _xiami_token = await fetch_xiami_token().catch(error => error);
+    var infos = extract_url(infos);
 
 }
-
-function generate_song_singer(res) {
-  /**
-   * generate_song_singer : iteriate the whole userplaylist to get the data from Xiami
-   * Stirng -> {song @String : singer @String }
-   */
-  var song_singers = Array();
-  var cheerio = require('cheerio'),
-    $ = cheerio.load(res.text);
-  $(".song_name").each((i, element) => {
-    var song = $(element).find("a").first().text();
-    var singer = $(element).find(".artist_name").text();
-    song_singers.push([song, singer])
-  })
-  return song_singers;
-}
-
-// get_user_playlist("","");
