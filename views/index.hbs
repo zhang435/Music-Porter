@@ -8,12 +8,12 @@
 
 <body>
     <p>
-        Xiami user: plase use this line
+        Xiami user: Please use this line
     </p>
     <div>
         <form action="/xiami" method="post">
-            <input type="input" name="playlist_url" placeholder="xiami playListUrl" required>
-            <input type="hidden" name="spotifyAccessToken" value={{access_token}}>
+            <input type="input" name="playlistUrl" placeholder="xiami playListUrl" required>
+            <input type="hidden" name="spotifyAccessToken" value={{accessToken}}>
             <input type="submit" value="Submit">
         </form>
     </div>
@@ -23,7 +23,7 @@
     <div>
         <form action="/netEaseCloudMusic" method="post">
             <input type="input" name="playlistUrl" size="40" placeholder="netEaseCloudMusic PlayListUrl" required>
-            <input type="hidden" name="spotify_access_token" value={{access_token}}>
+            <input type="hidden" name="spotifyAccessToken" value={{accessToken}}>
             <input type="submit" value="Submit">
         </form>
     </div>

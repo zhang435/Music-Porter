@@ -1,302 +1,506 @@
-// referene from https://developer.spotify.com/web-api/authorization-guide/
-// this is build base on the instruction , the flow of 
-var express = require('express'); // Express web server framework
-var request = require('request'); // "Request" library
-var querystring = require('querystring');
-
-const CLIENT_ID = 'c778e8173793481c907f2ee677fdf578'; // Your client id
-const CLIENT_SECRET = '3d5d8daa997a4b29b11100d55b018ad2'; // Your secret
-const url = "https://still-brushlands-47642.herokuapp.com/"
-// const url = "http://localhost:8888/"
-
-const REDIRECT_URI = url + "callback"; // Your redirect uri
-const SCOPE = 'playlist-modify-public playlist-read-collaborative playlist-modify-private'
-const playlist_name = "tmp"
 const rp = require("request-promise");
 
-// in spotify , 戴佩妮 been record as Penny Tai, her song is ony avaliable if I search with offical name, use a dic to stoore this information 
-// request authorization tp access data
+const CLIENT_ID = "c778e8173793481c907f2ee677fdf578"; // Your client id
+const CLIENT_SECRET = "3d5d8daa997a4b29b11100d55b018ad2"; // Your secret
+// const url = "https://still-brushlands-47642.herokuapp.com/"
+const url = "http://localhost:8888/";
+
+const REDIRECT_URI = url + "callback"; // Your redirect uri
+const SCOPE =
+    "playlist-modify-public playlist-read-collaborative playlist-modify-private";
+
 module.exports = {
     CLIENT_ID,
     CLIENT_SECRET,
     REDIRECT_URI,
     SCOPE,
-    get_user_id,
-    create_playlist,
-    get_playlist_id,
-    get_songs_uri,
-    add,
-    Spotify
-}
+    init
+};
 
-async function get_user_id(access_token) {
+/**
+ * Spotify wrapper object
+ *
+ * @param {*} accessToken xiami access token
+ * @param {*} source playlistName, if the user start from Xiami, source = xiami, or if user come from netEase, the source = NetEase
+ * **/
+
+function Spotify(accessToken, source) {
+    this.accessToken = accessToken;
+    this.playListName = "From " + source;
+    this.userID = null;
+    this.playListID = null;
+
     /**
      * get_user_id : return the user id for the user, some user created with facebook may encounter actual useranme does not match with the one they know
      * String -> Promise
      * => Promise with user's id
      */
-    var options = {
-        url: "https://api.spotify.com/v1/me",
-        headers: {
-            'Authorization': 'Bearer ' + access_token
-        },
-        json: true
-    };
-    return new Promise((resolve, reject) => {
-        rp(options)
-            .then((body) => {
-                if (body.id)
-                    resolve(body.id)
-                reject({
-                    messgae: "Unable to get user id"
+    this.getUserID = async () => {
+        var options = {
+            url: "https://api.spotify.com/v1/me",
+            headers: {
+                Authorization: "Bearer " + this.accessToken
+            },
+            json: true
+        };
+
+        console.debug(this.accessToken, this.playListName);
+
+        return new Promise((resolve, reject) => {
+            rp(options)
+                .then(body => {
+                    // get the user id through API
+                    if (body.id) {
+                        return resolve({
+                            success: true,
+                            val: body.id
+                        });
+                    }
+
+                    return reject({
+                        success: false,
+                        message: "Unable to get data for" + this.accessToken
+                    });
                 })
-            }).catch(error => {
-                reject({
-                    error
+                .catch(error => {
+                    return reject({
+                        success: false,
+                        message: "error when sending the request to getUserID, error : " +
+                            error + this.accessToken + "?"
+                    });
+                });
+        });
+    };
+
+    /**
+     * check_playlist : all the song fetch from xiami will been store in a playlist, which name as tmp, this is just prevent dupliate creation
+     * @returns Promise
+     */
+    this.ifPlayListExists = async () => {
+        var options = {
+            url: "https://api.spotify.com/v1/users/" + this.userID + "/playlists",
+            headers: {
+                Authorization: "Bearer " + this.accessToken
+            },
+            json: true
+        };
+
+        return new Promise((resolve, reject) => {
+            // if this function been used before userID/accessToekn defined, rej
+            if (this.userID === undefined || this.accessToken === undefined) {
+                return reject({
+                    success: false,
+                    message: "userID/accessToken is not initlized yet, code error"
+                });
+            }
+
+            // go through all playlist, make sure the playlist exists
+            rp(options)
+                .then(res => {
+                    var found = false;
+                    if (res.items.map(item => item.name).includes(this.playListName)) {
+                        found = true;
+                    }
+
+                    return resolve({
+                        success: true,
+                        val: {
+                            found: found,
+                            val: res.items.find(pl => pl.name == this.playListName)
+                        }
+                    });
+                })
+                .catch(error => {
+                    return reject({
+                        success: false,
+                        message: "error when sending the request to ifPlayListExists, error code: " +
+                            error
+                    });
+                });
+        });
+    };
+
+    /**
+     * check if paltlist already been created or not, if not created, create one and return the id of pl
+     * if created before, it will get the id from pl
+     * create_playlist : create default playlist with PlayListName
+     * => Promise
+     */
+    this.createPlaylist = async () => {
+
+        var _ = await this.getPlayLists().catch(err => err);
+        if (_.success) {
+            return new Promise((resolve, reject) => {
+                // console.debug(_.val.map(elem => elem.name), _.val.map(elem => elem.name).includes(this.playListName), this.playListName);
+                // if the playlist is already been created
+                if (_.val.map(elem => elem.name).includes(this.playListName)) {
+                    console.debug("playlist already exists " + this.playListName);
+                    var res = _.val.find(elem => {
+                        // console.debug(elem.name, this.playListName, elem.name == this.playListName)
+                        return elem.name == this.playListName
+                    });
+                    return resolve({
+                        success: true,
+                        val: res.id
+                    });
+                } else {
+                    // create playlist
+                    console.debug("create playlist " + this.playListName);
+                    var options = {
+                        method: "POST",
+                        url: "https://api.spotify.com/v1/users/" + this.userID + "/playlists",
+                        body: JSON.stringify({
+                            name: this.playListName,
+                            public: true
+                        }),
+                        dataType: "json",
+                        headers: {
+                            Authorization: "Bearer " + this.accessToken,
+                            "Content-Type": "application/json"
+                        }
+                    };
+
+                    // send request to API
+                    rp(options)
+                        .then(res => {
+                            res = JSON.parse(res);
+                            resolve({
+                                "success": true,
+                                val: res.id
+                            });
+                        })
+                        .catch(error => {
+                            return reject({
+                                success: false,
+                                message: "error when sending the request to create PlayList, error code: " +
+                                    error
+                            });
+                        });
+
+                }
+            });
+        } else {
+            return new Promise((resolve, reject) => {
+                return reject({
+                    success: false,
+                    "message": _.message
                 });
             });
-    })
-}
-
-
-
-async function check_playlist(user_id, access_token) {
-    /**
-     * check_playlist : all the song fetch from xiami will been store in a playlist, which name as tmp, this is just prevent dupliate creation 
-     * String -> String -> Promise
-     * => Promise with None
-     */
-    var options = {
-        url: 'https://api.spotify.com/v1/users/' + user_id + '/playlists',
-        headers: {
-            'Authorization': 'Bearer ' + access_token
-        },
-        json: true
-    };
-    return new Promise((resolve, reject) => {
-        rp(options)
-            .then(res => {
-                res.items.forEach(element => {
-                    if (element.name === playlist_name)
-                        resolve(false);
-                });
-                resolve(true);
-            })
-    })
-}
-
-
-async function create_playlist(user_id, access_token) {
-    /**
-     * create_playlist : create defualt playlist 
-     * String -> String -> Void
-     * => Promise with None
-     */
-    var options = {
-        method: "POST",
-        url: 'https://api.spotify.com/v1/users/' + user_id + '/playlists',
-        body: JSON.stringify({
-            'name': playlist_name,
-            'public': true
-        }),
-        dataType: 'json',
-        headers: {
-            'Authorization': 'Bearer ' + access_token,
-            'Content-Type': 'application/json',
         }
     };
-    // resolve it the play not been created, otherwise return reject
-    var bool = await check_playlist(user_id, access_token).catch(error => error);
-    return new Promise((resolve, reject) => {
-        if (bool) {
-            rp(options)
-                .then(res => resolve())
-                .catch(error => {});
-        }
-        resolve();
-    })
 
-}
-
-async function get_playlist_id(user_id, access_token) {
     /**
-     * get_playlist_id : get the playlist id for playlist name 
-     * * https://developer.spotify.com/web-api/get-a-list-of-current-users-playlists/
-     * @(String , function)
-     * => Promise with defualt playlist id
-     */
-    var options = {
-        url: "https://api.spotify.com/v1/users/" + user_id + "/playlists",
-        headers: {
-            'Authorization': 'Bearer ' + access_token
-        },
-        json: true
-    };
-
-    return new Promise((resolve, reject) => {
-        rp(options)
-            .then((body) => {
-                for (var i = 0; i < body.items.length; i++) {
-                    element = body.items[i];
-                    if (element.name === playlist_name)
-                        resolve(element.id);
-                }
-                reject({
-                    message: "Unable to find playlist " + playlist_name
-                });
-            }).catch(error => {
-                error: error
-            })
-    })
-}
-
-
-
-// ///// all the function above should be called only once///////////////////////////////////////////////////////
-
-function get_artist_offical_name(artist, access_token) {
-    /***
      * during spotify searching, it is more accurate to get the official name that spotify recorded
-     * the search return a new promise with artist offical name 
+     * the search return a new promise with artist offical name
      * String -> String -> Promise
      */
-    var options = {
-        url: "https://api.spotify.com/v1/search?q=" + encodeURIComponent(artist) + "&type=artist",
-        headers: {
-            'Authorization': 'Bearer ' + access_token
-        },
-        json: true
+    this.getArtistName = async artist => {
+        var options = {
+            url: "https://api.spotify.com/v1/search?q=" +
+                encodeURIComponent(artist) +
+                "&type=artist",
+            headers: {
+                Authorization: "Bearer " + this.accessToken
+            },
+            json: true
+        };
+
+        // search for the artist
+        return new Promise((resolve, reject) => {
+            rp(options)
+                .then(res => {
+                    if (res.artists && res.artists.items.length != 0) {
+                        // console.debug("found " + JSON.stringify(res.artists.items[0]))
+                        return resolve({
+                            success: true,
+                            found: true,
+                            val: res.artists.items[0].name
+                        });
+                    }
+                    return resolve({
+                        success: true,
+                        found: false,
+                        val: artist
+                    });
+                })
+                .catch(error => {
+                    return reject({
+                        success: false,
+                        message: "error when sending the request to getArtistOfficalName, error: " +
+                            error
+                    });
+                });
+        });
     };
 
-    return new Promise((resolve, reject) => {
-        rp(options)
-            .then((body) => {
-                if (body.artists && body.artists.items.length != 0)
-                    resolve(body.artists.items[0].name);
-                else
-                    reject({
-                        message: "Unable to find artirst" + artist
-                    });
-            }).catch(error => {
-                reject({
-                    error: error.statusCode
+    this.getPlayLists = async () => {
+        var options = {
+            url: "https://api.spotify.com/v1/users/" + this.userID + "/playlists",
+            headers: {
+                Authorization: "Bearer " + this.accessToken
+            },
+            json: true
+        };
+
+        return new Promise((resolve, reject) => {
+            // if this function been used before userID/accessToken defined, rej
+            if (this.userID === undefined || this.accessToken === undefined) {
+                return reject({
+                    success: false,
+                    message: "userID/accessToken is not initlized yet, code error"
+                });
+            }
+
+            // go through all playlist, make sure the playlist exists
+            rp(options).then(res => {
+                return resolve({
+                    success: true,
+                    val: res.items
                 })
-            })
-    })
-}
+            });
+        });
+    };
 
-
-
-function get_song_uri(track, artist, access_token) {
     /**
      * get_song_uri : get the uri match to track , which will be used in when add music
-     * String  -> String -> String -> Promise
+     * String  -> String -> Promise
      * => Promise with uri as value
      */
-    var options = {
-        url: "https://api.spotify.com/v1/search?q=" + encodeURIComponent(track) + "&type=track",
-        headers: {
-            'Authorization': 'Bearer ' + access_token
-        },
-        json: true,
-        resolveWithFullResponse: true
+    this.getSongURI = async (track, artist) => {
+        artist = await this.getArtistName(artist).catch(err => err);
+        if (!artist.success) {
+            return new Promise((resolve, reject) => {
+                return reject({
+                    success: false,
+                    message: artist.message
+                });
+            });
+        }
+
+        if (!artist.found) {
+            return new Promise((resolve, reject) => {
+                return resolve({
+                    success: true,
+                    found: false,
+                    val: undefined
+                })
+            });
+        }
+
+        artist = artist.val
+
+        var options = {
+            url: `https://api.spotify.com/v1/search?q=track${encodeURIComponent(
+          ":" + track + " "
+        )}artist${encodeURIComponent(":" + artist)}` + "&type=track",
+            headers: {
+                Authorization: "Bearer " + this.accessToken
+            },
+            json: true,
+            resolveWithFullResponse: true
+        };
+        // console.log(options.url);
+
+        return new Promise((resolve, reject) => {
+            rp(options).then(res => {
+                body = res.body;
+
+                // if any of these values are undefined, it means the function is won't return any valid res
+                if ([body.tracks, body.tracks.items].includes(undefined)) {
+                    return reject({
+                        success: false,
+                        message: "one of the val for finding SongURI is undefined : " + [body.tracks, body.tracks.items]
+                    });
+                }
+
+                if (body.tracks.items.length == 0) {
+                    return resolve({
+                        success: true,
+                        found: false,
+                        val: undefined
+                    });
+                    return;
+                }
+
+                var uri = body.tracks.items[0].uri;
+                return resolve({
+                    success: true,
+                    found: true,
+                    val: uri
+                });
+            });
+        });
+    };
+    /**
+     * @param {*} arr list of song singer
+     * called right after
+     */
+    this.getSongsURI = async arr => {
+        var passed = [];
+        var fail = [];
+        var uris = [];
+
+        for (i in arr) {
+            element = arr[i];
+            var _ = await this.getSongURI(element[0], element[1]).catch(err => err);
+            if (!_.success || !_.found) {
+                fail.push(element);
+            }
+
+            if (_.success && _.found) {
+                passed.push(element);
+                uris.push(_.val);
+            }
+        }
+
+        return new Promise((resolve, reject) => {
+            return resolve({
+                success: true,
+                val: {
+                    passed,
+                    fail,
+                    uris
+                }
+            });
+        });
     };
 
+    /**
+     * @param songs list of track uri
+     */
+    this.addSongsToPlaylist = async (songs) => {
+        var options = {
+            method: "POST",
+            url: "https://api.spotify.com/v1/users/" +
+                this.userID +
+                "/playlists/" +
+                this.playListID +
+                "/tracks",
+            headers: {
+                Authorization: "Bearer " + this.accessToken,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                uris: songs
+            })
+        };
+        return new Promise((resolve, reject) => {
+            rp(options).then(body => {
+                if (body.statusCode / 500 >= 1) {
+                    return reject({
+                        success: false,
+                        message: "encounter error when add songs to playlist : " + songs
+                    });
+                } else {
+                    return resolve({
+                        success: true,
+                        val: null
+                    });
+                }
+            }).catch(err => {
+                console.debug(err.message);
+                return reject({
+                    success: false,
+                    message: "encounter error when add songs to playlist : " + songs
+                });
+            });
+        });
+    };
+
+    /**
+     * __init__ function for Spotify
+     * outter class should only use this method
+     */
+}
+
+async function init(accessToken, source) {
+
+    sp = new Spotify(accessToken, source);
+    console.debug(accessToken);
+    var _ = await sp.getUserID().catch(err => err);
+    if (!_.success) {
+        return new Promise((resolve, reject) => {
+            reject({
+                success: false,
+                message: _.message
+            })
+        });
+    }
+
+    console.debug("got userID " + JSON.stringify(_));
+
+    if (_.success) {
+        sp.userID = _.val;
+    } else {
+        return new Promise((resolve, reject) => {
+            return reject({
+                success: false,
+                message: _.message
+            });
+        });
+    }
+
+    var _ = await sp.createPlaylist().catch(err => err);
+    console.debug("got playListID" + JSON.stringify(_));
+    if (_.success) {
+        sp.playListID = _.val;
+    } else {
+        console.debug(_.message);
+    }
 
     return new Promise((resolve, reject) => {
-        rp(options)
-            .then((response) => {
-                body = response.body;
-                if (body.tracks && body.tracks.items) {
-                    for (var i = 0; i < body.tracks.items.length; i++) {
-                        ele = body.tracks.items[i];
-                        if (encodeURIComponent(ele['artists'][0]['name'].toLowerCase()) === encodeURIComponent(artist.toLowerCase())) {
-                            resolve(ele.uri);
-                        }
-                    }
-                }
-                reject({
-                    message: `Unable to find data for ${track} ${artist}`
-                })
-            }).catch((error) => {
-                reject({
-                    error: error
-                });
-            })
-    })
+        return resolve({
+            success: true,
+            val: sp
+        });
+    });
 }
 
-function print(p) {
-    console.log(p);
-}
+// accessToken =
+// "BQCR-_3DcMjidH0IRSF1XWij3p9NH_Sj3dlt2cQBz42Ft9Rv2YFNKXaR8lgCBq9TJSFSwXnnXg9xbkkClX4K0uGAI-lHYUXiAhW5JXqRqXfKtDXxKjR534Ti08xT_k-fTf8F6Y9w3fJpPk3QHsDVrsuF4hPlym0uTB8yKdmTGW39QY1BJEtntbVVEIVykVENEHvgeUgWJLbaFw";
 
-async function get_songs_uri(arr, access_token) {
-    /** 
-     * get one page of playlist from xiami and and search them one by one to get thespotify tracj uri,
-     * typeof uri !== "object" since once the promise been reject, it will return a dict contains with message or eror {error/message: ...}
-     * detail to check in get_artist_offical_name/get_song_uri
-     * [[String(track),String(artist)] ...] -> Array
-     * 
-     */
-    var passed = [];
-    var fail = [];
-    for (var i = 0; i < arr.length; i++) {
-        element = arr[i];
+// var obj = init(accessToken, "tmp[").then(res => {
+//   console.debug(res);
+// });
 
-        var artist = await get_artist_offical_name(element[1], access_token).catch(error => error);
+// (async () => {
+//     var sp = await init(accessToken, "test1");
+//     console.log(sp);
+//     if (sp.success) {
+//         sp = sp.val;
+//     } else {
+//         return;
+//     }
+//     songs_artist = [
+//         ["十年", "陈奕迅"],
+//         ["kdjsfksjdfn", "陈奕迅"],
+//         ["pressure", "RL Grime"]
+//     ];
+//     var name = await sp.getArtistName(songs_artist[1]).catch(err => err);
+//     if (name.success) {
+//         name = name.val;
+//     } else {
+//         console.debug(name.message);
+//         return;
+//     }
 
-        if (typeof artist !== "object") {
-            var uri = await get_song_uri(element[0], artist, access_token).catch(error => error);
-            if (typeof uri !== "object") {
-                passed.push(uri);
-            } else {
-                fail.push([element, uri]);
-            }
-        } else {
-            fail.push([element, artist]);
-        }
-    }
-    return {
-        passed,
-        fail
-    }
+//     console.debug(name);
 
-}
 
-async function add(user_id, playlist_id, arr, access_token) {
-    /**
-     * get the playlist id and song from xiami on certain pages, then add all of them in to the playlist been created
-     * add : String -> arr[spotify uri] -> String -> Void
-     */
-    var options = {
-        method: "POST",
-        url: "https://api.spotify.com/v1/users/" + user_id + "/playlists/" + playlist_id + "/tracks",
-        headers: {
-            'Authorization': 'Bearer ' + access_token,
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            uris: arr
-        })
-    }
-    rp(options)
-        .then(body => {})
-        .catch(error => error)
-}
+//     var uris = await sp.getSongsURI(songs_artist).catch(err => err);
+//     if (uris.success) {
+//         console.debug(uris.val);
 
-/**
- * the main function for spotify.js, main function only need to call this function to generate all necessary information about spotify
- * @param {*} access_token spotify access token
- */
-async function Spotify(access_token) {
-    var username = await Spotify.get_user_id(access_token).catch(error => console.log(error));
-    var _ = await Spotify.create_playlist(username, access_token).catch(error => console.log(error));
-    var total_page = await Xiami.total_page(xiami_data).catch(error => console.log(error));
-    var playlist_id = await Spotify.get_playlist_id(username, access_token).catch(error => console.log(error));
+//     } else {
+//         console.debug(uris.message);
+//     }
 
-    return {
-        username,
-        total_page,
-        playlist_id
-    };
-}
+//     var _ = await sp.addSongsToPlaylist(uris.val.uris).catch(err => err);
+//     if (_.success) {
+//         console.debug("done");
+//     } else {
+//         console.debug(_.message);
+//     }
+
+
+// })();
