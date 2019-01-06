@@ -7,7 +7,7 @@ const port = process.env.PORT || 8888;
 
 const Spotify = require("./Spotify");
 const Xiami = require("./Xiami");
-const Netease = require("./NetEaseCloudMusic");
+const NetEase = require("./NetEaseCloudMusic");
 // const account = require("./account")
 
 
@@ -74,7 +74,7 @@ app.get("/callback", (req, res) => {
 // handler for Xiami
 app.post("/xiami", (req, res) => {
     var playlistUrl = req.body.playlistUrl;
-    const spotifyAccessToken = req.body.spotifyAccessToken;
+    var spotifyAccessToken = req.body.spotifyAccessToken;
     if ([playlistUrl, spotifyAccessToken].includes(undefined)) {
         res.end("giving undefined value when rendering Xiami", JSON.stringify([playlistUrl, spotifyAccessToken]));
     }
@@ -84,11 +84,11 @@ app.post("/xiami", (req, res) => {
 })
 
 // handler for NetEaseMusic
-app.post("/netEaseCloudMusic", (req, res) => {
-    const spotifyAccessToken = req.body.spotifyAccessToken;
-    const netEaseCloudMusicUrl = req.body.playlistUrl;
+app.post("/NetEaseCloudMusic", (req, res) => {
+    var spotifyAccessToken = req.body.spotifyAccessToken;
+    const NetEaseCloudMusicUrl = req.body.playlistUrl;
     res.setHeader("Content-Type", "text/html; charset=utf-8");
-    neteaseProcess(spotifyAccessToken, netEaseCloudMusicUrl, res);
+    NetEaseProcess(spotifyAccessToken, NetEaseCloudMusicUrl, res);
 })
 
 
@@ -151,22 +151,41 @@ async function xiamiProcess(url, spotifyAccessToken, res) {
     res.end("<h1> Finished </h1>");
 }
 
-async function neteaseProcess(spotify_access_token, netEaseCloudMuiscUrl, res) {
-    // var userName = await Spotify.get_user_id(spotify_access_token).catch(error => console.log(error));
-    // var _ = await Spotify.create_playlist(username, spotify_access_token).catch(error => console.log(error));
-    // var song_aritsts = await Netease.generate_song_singer(netEaseCloudMuiscUrl, res).catch(err => console.log(err));
-    // var playlist_id = await Spotify.get_playlist_id(userName, spotify_access_token).catch(error => console.log(error));
+async function NetEaseProcess(spotifyAccessToken, NetEaseCloudMusicUrl, res) {
 
-    // // split search from whole to part, so that usre can track the process
-    // var chunk = 5;
-    // for (var i = 0; i < song_aritsts.length; i += chunk) {
-    //     var part = song_aritsts.slice(i, i + chunk);
-    //     part = await Spotify.get_songs_uri(part, spotify_access_token);
-    //     res.write(JSON.stringify(part));
-    //     await Spotify.add(username, playlist_id, part.passed, spotify_access_token).catch(error => console.log(error));
-    // }
+    var sp = await Spotify.init(spotifyAccessToken, "NetEase ").catch(err => err);
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    if (!sp.success) {
+        res.end(JSON.stringify({
+            "spotify": sp.message
+        }));
+    } else {
+        sp = sp.val;
+    }
 
+    var songArtists = await NetEase.generateSongSingers(NetEaseCloudMusicUrl, res).catch(err => console.log(err));
 
+    // split search from whole to part, so that user can track the process
+    var chunk = 10;
+    for (var i = 0; i < songArtists.length; i += chunk) {
+        var part = songArtists.slice(i, i + chunk);
+
+        var uris = await sp.getSongsURI(part).catch(err => err);
+        if (uris.success) {
+            res.write(JSON.stringify(uris));
+        } else {
+            res.end(uris.message);
+            return;
+        }
+
+        sp.addSongsToPlaylist(uris.val.uris).then((result) => {
+            res.write(JSON.stringify(result));
+        }).catch((err) => {
+            res.end(JSON.stringify(err.message));
+            return;
+        });
+        // await Spotify.add(username, playlist_id, part.passed, spotify_access_token).catch(error => console.log(error));
+    }
     res.end("<h1> done,check 'tmp' in Spotify</h1>");
 }
 
