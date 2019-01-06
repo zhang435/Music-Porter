@@ -1,47 +1,34 @@
 # Music Porter
 
-## Note Xiami site is nolonger avaliable becuase of the new slide verfication login for xiami site, So far I do not have time to find a way to go through it, Please make a PR if you are able to implement this or create issue if you know the solution.
-
 ### From Xiami/NetEaseCloudMusic to Spotify implemented with Node.js
 
 ![](https://upload-images.jianshu.io/upload_images/4457561-ef588ad60e2dae00.png)
 
-If you have trouble migrate music from Xiami/NetEaseCloudMusic to Spotify
-this is the application you looking for
-The app is trying to help student who study abroad, like myself, I start using spotify after I studied in US,
-which is a really cool app, while, most my playlist is still in Xiami or NetEaseCloudMusic, So, to stop switch from
-playlist to playlist, I made this website to help you migrate your music from Xiami or NetEaseCloudMusic to Spotfy
-
-It was only support Xiami, but many users asked to include NeteaseCloudMusic as well, so, you ask, I do it.
+If you have trouble migrate music from Xiami/NetEaseCloudMusic to Spotify,
+this is the application you looking for!!
 
 [Start Use Xiami/NetEaseCloudMusic to Spotify by click this link](https://still-brushlands-47642.herokuapp.com/)
 
 ### Introduction
 
----[Spotify access](https://developer.spotify.com/web-api/authorization-guide/) -> [xiami login](http://www.xiami.com/) -> add song page by page into Spotify
-
-this is a Node.js web app that in purpose of adding songs from [Xiami](https://www.xiami.com) or [NetEaseCloudMusic](https://music.163.com/) to [Spotify](www.spotify.com)
-
-#### for Xiami :
+---
 
 [Spotify access](https://developer.spotify.com/web-api/authorization-guide/) -> [xiami login](http://www.xiami.com/) -> add song page by page into Spotify
 
+[Spotify access](https://developer.spotify.com/web-api/authorization-guide/) -> [NetEase playListUrl]() -> add all songs into playlist at once
+
 [Video tutorial](https://youtu.be/gtFL4aW6IWc)
-
-#### for NetEaseCloudMusic:
-
-NetEaseCloudMusic palylist -> add song page by page into Spotify
 
 ### Requirement
 
 ---
 
-knowing your Spotify account
+Spotify Username & Password
 **_for Xiami_**
-knowing your Xiami account
+Url of second page of your xiami PlayList
 
 **_for NetEaseCloudMusic_**
-knowing your playlist url
+playlist url
 
 **_Note : if you got error "请输入验证码"， please wait for an hour or so until validatoin end for you account_**
 
