@@ -2,6 +2,10 @@ module.exports = {
     netEaselink1,
     netEaselink2
 }
+
+var netEaselink1 = "https://music.163.com/playlist?id=501341874";
+var netEaselink2 = "https://music.163.com/playlist?id=11879687";
+
 var test_data = {
     'Always on My Mind': 'Elvis Presley',
     '兰州 兰州': '低苦艾',
@@ -133,8 +137,7 @@ test_data = Object.keys(test_data).map(x => [x, test_data[x]])
 
 var access_token = "BQBWdMgpWXsqkZvHLkvxf_RSpWNdmKgAvw9sZ6-LwIR6Nb54bVlellgo3VeMfvbXFvbN1Mi6jH6MBMbtE6xxhgPI7yCMNT__bi51xpDsJobahO1zIN4-VKF4_Bxhep2uQ_7i6ARKPX0LlvEU2EKthcLQ0J9BMs1NVyUPqSova2khY3O9bDA_rB9teTC4ujFsKeb-JRugJ2Yaz9U";
 
-var netEaselink1 = "https://music.163.com/playlist?id=501341874";
-var netEaselink2 = "https://music.163.com/playlist?id=11879687";
+
 
 // console.log(test_data.length);
 
