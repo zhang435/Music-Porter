@@ -186,7 +186,7 @@ async function NetEaseProcess(spotifyAccessToken, NetEaseCloudMusicUrl, res) {
         });
         // await Spotify.add(username, playlist_id, part.passed, spotify_access_token).catch(error => console.log(error));
     }
-    res.end("<h1> done,check 'tmp' in Spotify</h1>");
+    res.end("<h1> done,check 'from NetEase' in Spotify</h1>");
 }
 
 app.listen(port);
