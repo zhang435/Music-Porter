@@ -106,7 +106,7 @@ async function generateSongSingers(link, sp, res) {
             sp.addSongsToPlaylist(uris.val.uris).then((result) => {
                 // res.write(JSON.stringify(result) + "\n");
             }).catch((err) => {
-                res.end(JSON.stringify(err.message));
+                res.write(JSON.stringify(err.message));
                 return;
             });
             songArtists = new Array();

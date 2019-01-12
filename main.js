@@ -102,6 +102,7 @@ async function xiamiProcess(url, spotifyAccessToken, res) {
             "xiami": xm.message,
             "spotify": sp.message
         }));
+        return;
     } else {
         xm = xm.val;
         sp = sp.val;
@@ -112,6 +113,7 @@ async function xiamiProcess(url, spotifyAccessToken, res) {
         var page = await xm.fetchPage(i).catch(err => err);
         if (!page.success) {
             res.end(page.message);
+            return;
         } else {
             page = page.val;
         }
@@ -121,6 +123,7 @@ async function xiamiProcess(url, spotifyAccessToken, res) {
         var xmSongSingers = await xm.generateSongSinger(page).catch(err => err);
         if (!xmSongSingers.success) {
             res.end(xmSongSingers.message);
+            return;
         } else {
             xmSongSingers = xmSongSingers.val;
         }
@@ -136,6 +139,7 @@ async function xiamiProcess(url, spotifyAccessToken, res) {
             res.write(JSON.stringify(uris));
         } else {
             res.end(uris.message);
+            return
         }
 
 
@@ -144,7 +148,7 @@ async function xiamiProcess(url, spotifyAccessToken, res) {
             res.write(JSON.stringify(result));
         }).catch((err) => {
             res.end(JSON.stringify(err.message));
-
+            return
         });
 
     };
@@ -165,7 +169,7 @@ async function NetEaseProcess(spotifyAccessToken, NetEaseCloudMusicUrl, res) {
 
     var songArtists = await NetEase.generateSongSingers(NetEaseCloudMusicUrl, sp, res).catch(err => console.log(err));
     console.debug("got all songs from NEtEase");
-    res.write("<h1> done,check 'from NetEase' in Spotify</h1>");
+    res.end("<h1> done,check 'from NetEase' in Spotify</h1>");
 }
 
 app.listen(port);
