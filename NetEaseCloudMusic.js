@@ -9,8 +9,6 @@ module.exports = {
 }
 
 
-
-
 /**
  * use playlist url to get the 
  * @param {String} link the playlist link, it will fetch table html content to get_song_profile
@@ -86,7 +84,7 @@ async function getSongSingerFromProfilePage(link) {
  * this should be the only entrance for the netEaseMusic
  * @param {*} link to thr playlist
  */
-async function generateSongSingers(link, res) {
+async function generateSongSingers(link, sp, res) {
     link = link.replace("/#/", "/");
     var profiles = await get_song_profile(link).catch(error => console.log(error));
     var songArtists = new Array();
@@ -94,14 +92,34 @@ async function generateSongSingers(link, res) {
     for (var i = 0; i < profiles.length; i++) {
         var song_singer = await getSongSingerFromProfilePage(profiles[i]).catch(err => console.log(err));
         console.log(song_singer);
-        res.write((i + 1) + ", " + song_singer.toString() + "</br>");
+        // res.write((i + 1) + ", " + song_singer.toString() + "</br>");
         songArtists.push(song_singer);
+        if (songArtists.length == 10 || (i == profiles.length - 1)) {
+            var uris = await sp.getSongsURI(songArtists).catch(err => err);
+            if (uris.success) {
+                res.write(JSON.stringify(uris) + "<br>");
+            } else {
+                res.write(uris.message);
+                return;
+            }
+
+            sp.addSongsToPlaylist(uris.val.uris).then((result) => {
+                // res.write(JSON.stringify(result) + "\n");
+            }).catch((err) => {
+                res.end(JSON.stringify(err.message));
+                return;
+            });
+            songArtists = new Array();
+        }
     }
 
     // res.write("<h1>search fetched songs in Spotify</h1>");
 
     return new Promise((resolve, rej) => {
-        resolve(songArtists);
+        resolve({
+            success: true,
+            val: null
+        });
         rej("can not get song singers")
     })
 
@@ -112,6 +130,9 @@ async function generateSongSingers(link, res) {
 // generateSongSingers();
 // var netEaselink1 = "https://music.163.com/playlist?id=501341874";
 // var netEaselink2 = "https://music.163.com/playlist?id=11879687";
+// var netEaselink3 = "https://music.163.com/#/playlist?id=2542915771";
 // // console.debug(testconst)
-// generateSongSingers(netEaselink1);
-// fetch_page(netEaselink1).catch(err => console.log(err));
+// (async () => {
+//     var songArtists = await generateSongSingers(netEaselink1, null).catch(err => console.log(err));
+//     console.log(songArtists);
+// })()

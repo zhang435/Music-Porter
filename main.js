@@ -163,30 +163,9 @@ async function NetEaseProcess(spotifyAccessToken, NetEaseCloudMusicUrl, res) {
         sp = sp.val;
     }
 
-    var songArtists = await NetEase.generateSongSingers(NetEaseCloudMusicUrl, res).catch(err => console.log(err));
-
-    // split search from whole to part, so that user can track the process
-    var chunk = 10;
-    for (var i = 0; i < songArtists.length; i += chunk) {
-        var part = songArtists.slice(i, i + chunk);
-
-        var uris = await sp.getSongsURI(part).catch(err => err);
-        if (uris.success) {
-            res.write(JSON.stringify(uris));
-        } else {
-            res.end(uris.message);
-            return;
-        }
-
-        sp.addSongsToPlaylist(uris.val.uris).then((result) => {
-            res.write(JSON.stringify(result));
-        }).catch((err) => {
-            res.end(JSON.stringify(err.message));
-            return;
-        });
-        // await Spotify.add(username, playlist_id, part.passed, spotify_access_token).catch(error => console.log(error));
-    }
-    res.end("<h1> done,check 'from NetEase' in Spotify</h1>");
+    var songArtists = await NetEase.generateSongSingers(NetEaseCloudMusicUrl, sp, res).catch(err => console.log(err));
+    console.debug("got all songs from NEtEase");
+    res.write("<h1> done,check 'from NetEase' in Spotify</h1>");
 }
 
 app.listen(port);

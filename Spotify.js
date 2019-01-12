@@ -2,8 +2,8 @@ const rp = require("request-promise");
 
 const CLIENT_ID = "c778e8173793481c907f2ee677fdf578"; // Your client id
 const CLIENT_SECRET = "3d5d8daa997a4b29b11100d55b018ad2"; // Your secret
-const url = "https://still-brushlands-47642.herokuapp.com/"
-// const url = "http://localhost:8888/";
+// const url = "https://still-brushlands-47642.herokuapp.com/"
+const url = "http://localhost:8888/";
 
 const REDIRECT_URI = url + "callback"; // Your redirect uri
 const SCOPE =
@@ -369,6 +369,17 @@ function Spotify(accessToken, source) {
      * @param songs list of track uri
      */
     this.addSongsToPlaylist = async (songs) => {
+
+        if (songs.length == 0) {
+            return new Promise((resolve, reject) => {
+                resolve({
+                    success: true,
+                    val: null
+                })
+            });
+
+        }
+
         var options = {
             method: "POST",
             url: "https://api.spotify.com/v1/users/" +
@@ -401,7 +412,7 @@ function Spotify(accessToken, source) {
                 console.debug(err.message);
                 return reject({
                     success: false,
-                    message: "encounter error when add songs to playlist : " + songs
+                    message: "encounter error when add songs to playlist : " + err
                 });
             });
         });
@@ -457,11 +468,11 @@ async function init(accessToken, source) {
 }
 
 // accessToken =
-// "BQCR-_3DcMjidH0IRSF1XWij3p9NH_Sj3dlt2cQBz42Ft9Rv2YFNKXaR8lgCBq9TJSFSwXnnXg9xbkkClX4K0uGAI-lHYUXiAhW5JXqRqXfKtDXxKjR534Ti08xT_k-fTf8F6Y9w3fJpPk3QHsDVrsuF4hPlym0uTB8yKdmTGW39QY1BJEtntbVVEIVykVENEHvgeUgWJLbaFw";
+//     "BQAQCxsa8Ve0W4qzZX_x4Gq9fwed3r2emSZilWeTY17Ipncab4kEZKIWAQ5T33hnP_vzmYbtpWl_wxwysEmDVdsPjo1r64b3ovMt2r4ByyNFGGKoruW4ij5IDrjGZT3RWEUXfVwM5dmIfjGd6E5cfPAxXBLcu2F4VqcUbNG7liOY000N2GvnaNylP5ouwdk--v6OElHWMsUsaA";
 
-// var obj = init(accessToken, "tmp[").then(res => {
-//   console.debug(res);
-// });
+// // var obj = init(accessToken, "tmp").then(res => {
+// //   console.debug(res);
+// // });
 
 // (async () => {
 //     var sp = await init(accessToken, "test1");
@@ -473,8 +484,9 @@ async function init(accessToken, source) {
 //     }
 //     songs_artist = [
 //         ["十年", "陈奕迅"],
-//         ["kdjsfksjdfn", "陈奕迅"],
-//         ["pressure", "RL Grime"]
+//         ["God's Plan", "Drake"]
+//         // ["kdjsfksjdfn", "陈奕迅"],
+//         // ["pressure", "RL Grime"]
 //     ];
 //     var name = await sp.getArtistName(songs_artist[1]).catch(err => err);
 //     if (name.success) {
