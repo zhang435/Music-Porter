@@ -17,6 +17,8 @@ app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
     extended: true
 }));
 
+app.use(express.static('src'))
+
 const authorizeUrl = 'https://accounts.spotify.com/authorize?';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////  
