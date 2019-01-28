@@ -31,6 +31,7 @@
     "nodemon": "^1.18.9",
     "npm": "^6.5.0",
     "querystring": "^0.2.0",
+    "redis": "^2.8.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.2",
     "superagent": "^3.8.3",
