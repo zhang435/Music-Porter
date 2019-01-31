@@ -15,7 +15,7 @@ async function connect() {
     if (credential.connectionString === undefined) {
         credential = Credentials.DB_CONNECTION_LOCAL
     }
-    console.log(process.env.DATABASE_URL)
+    console.log("DATABASE_URL", process.env.DATABASE_URL)
     const client = new Client(credential);
 
 
