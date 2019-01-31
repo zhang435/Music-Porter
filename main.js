@@ -3,11 +3,13 @@ const request = require('request'); // "Request" library
 const querystring = require('querystring');
 const hbs = require("hbs");
 const app = express();
+
 const port = process.env.PORT || 8888;
 
 const Spotify = require("./Spotify");
 const Xiami = require("./Xiami");
 const NetEase = require("./NetEaseCloudMusic");
+const db = require("./db");
 // const account = require("./account")
 
 
@@ -78,10 +80,13 @@ app.post("/xiami", (req, res) => {
     var playlistUrl = req.body.playlistUrl;
     var spotifyAccessToken = req.body.spotifyAccessToken;
     if ([playlistUrl, spotifyAccessToken].includes(undefined)) {
-        res.end("giving undefined value when rendering Xiami", JSON.stringify([playlistUrl, spotifyAccessToken]));
+        res.end("got undefined value when rendering Xiami", JSON.stringify([playlistUrl, spotifyAccessToken]));
     }
 
     res.setHeader("Content-Type", "application/json; charset=utf-8");
+
+    // record the user playlist url for debugging purpose
+    db.insert(db.XIAMI_TABLENAME, playlistUrl);
     xiamiProcess(playlistUrl, spotifyAccessToken, res);
 })
 
@@ -90,6 +95,9 @@ app.post("/NetEaseCloudMusic", (req, res) => {
     var spotifyAccessToken = req.body.spotifyAccessToken;
     const NetEaseCloudMusicUrl = req.body.playlistUrl;
     res.setHeader("Content-Type", "text/html; charset=utf-8");
+
+    // record the user playlist url for debugging purpose
+    db.insert(db.NETEASE_TABLENAME, NetEaseCloudMusicUrl);
     NetEaseProcess(spotifyAccessToken, NetEaseCloudMusicUrl, res);
 })
 
@@ -165,12 +173,13 @@ async function NetEaseProcess(spotifyAccessToken, NetEaseCloudMusicUrl, res) {
         res.end(JSON.stringify({
             "spotify": sp.message
         }));
+        return;
     } else {
         sp = sp.val;
     }
 
-    var songArtists = await NetEase.generateSongSingers(NetEaseCloudMusicUrl, sp, res).catch(err => console.log(err));
-    console.debug("got all songs from NEtEase");
+    var songArtists = await NetEase.generateSongSingers(NetEaseCloudMusicUrl, sp, res).catch(err => res.write(err));
+    console.debug("got all songs from NetEase");
     res.end("<h1> done,check 'from NetEase' in Spotify</h1>");
 }
 
