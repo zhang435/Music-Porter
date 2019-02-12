@@ -427,7 +427,6 @@ function Spotify(accessToken, source) {
 async function init(accessToken, source) {
 
     sp = new Spotify(accessToken, source);
-    console.debug(accessToken);
     var _ = await sp.getUserID().catch(err => err);
     if (!_.success) {
         return new Promise((resolve, reject) => {

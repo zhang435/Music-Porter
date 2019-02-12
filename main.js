@@ -138,12 +138,10 @@ async function xiamiProcess(url, spotifyAccessToken, res) {
             xmSongSingers = xmSongSingers.val;
         }
 
-        // // console.debug(xmSongSingers, "!!!!!!");
         if (xmSongSingers.length == 0) {
             break;
         }
 
-        // console.debug(xmSongSingers);
         var uris = await sp.getSongsURI(xmSongSingers);
         if (uris.success) {
             res.write(JSON.stringify(uris));
