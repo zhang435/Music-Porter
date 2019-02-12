@@ -2,8 +2,8 @@ const rp = require("request-promise");
 
 const CLIENT_ID = "c778e8173793481c907f2ee677fdf578"; // Your client id
 const CLIENT_SECRET = "3d5d8daa997a4b29b11100d55b018ad2"; // Your secret
-// const url = "https://still-brushlands-47642.herokuapp.com/"
-const url = "http://localhost:8888/";
+const url = "https://still-brushlands-47642.herokuapp.com/"
+// const url = "http://localhost:8888/";
 
 const REDIRECT_URI = url + "callback"; // Your redirect uri
 const SCOPE =
@@ -427,7 +427,6 @@ function Spotify(accessToken, source) {
 async function init(accessToken, source) {
 
     sp = new Spotify(accessToken, source);
-    console.debug(accessToken);
     var _ = await sp.getUserID().catch(err => err);
     if (!_.success) {
         return new Promise((resolve, reject) => {
