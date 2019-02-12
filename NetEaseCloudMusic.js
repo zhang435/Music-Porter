@@ -93,7 +93,7 @@ async function generateSongSingers(link, sp, res) {
         var song_singer = await getSongSingerFromProfilePage(profiles[i]).catch(err => console.log(err));
         console.log(song_singer);
         songArtists.push(song_singer);
-        if (songArtists.length == 10 || (i == profiles.length - 1)) {
+        if (songArtists.length == 50 || (i == profiles.length - 1)) {
             var uris = await sp.getSongsURI(songArtists).catch(err => err);
             if (uris.success) {
                 res.write(JSON.stringify(uris) + "<br>");
