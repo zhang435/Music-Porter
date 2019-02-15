@@ -88,12 +88,12 @@ async function generateSongSingers(link, sp, res) {
     link = link.replace("/#/", "/");
     var profiles = await get_song_profile(link).catch(error => console.log(error));
     var songArtists = new Array();
-    // res.write("<h1>Fetching songs from NetEaseMusic: " + link + " : </h1>" + "\n");
+    res.write("<h1>Fetching songs from NetEaseMusic: " + link + " : </h1>" + "\n");
     for (var i = 0; i < profiles.length; i++) {
         var song_singer = await getSongSingerFromProfilePage(profiles[i]).catch(err => console.log(err));
         console.log(song_singer);
         songArtists.push(song_singer);
-        if (songArtists.length == 50 || (i == profiles.length - 1)) {
+        if (songArtists.length == 20 || (i == profiles.length - 1)) {
             var uris = await sp.getSongsURI(songArtists).catch(err => err);
             if (uris.success) {
                 res.write(JSON.stringify(uris) + "<br>");
