@@ -83,10 +83,11 @@ app.post("/xiami", (req, res) => {
         res.end("got undefined value when rendering Xiami", JSON.stringify([playlistUrl, spotifyAccessToken]));
     }
 
-    res.setHeader("Content-Type", "application/json; charset=utf-8");
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
 
     // record the user playlist url for debugging purpose
     db.insert(db.XIAMI_TABLENAME, playlistUrl);
+    res.write("<h1>start import Xiami playlist to spotify</h1>");
     xiamiProcess(playlistUrl, spotifyAccessToken, res);
 })
 
@@ -98,6 +99,7 @@ app.post("/NetEaseCloudMusic", (req, res) => {
 
     // record the user playlist url for debugging purpose
     db.insert(db.NETEASE_TABLENAME, NetEaseCloudMusicUrl);
+    res.write("<h1>start import netease playlist to spotify</h1>");
     NetEaseProcess(spotifyAccessToken, NetEaseCloudMusicUrl, res);
 })
 
@@ -166,7 +168,6 @@ async function xiamiProcess(url, spotifyAccessToken, res) {
 async function NetEaseProcess(spotifyAccessToken, NetEaseCloudMusicUrl, res) {
 
     var sp = await Spotify.init(spotifyAccessToken, "NetEase ").catch(err => err);
-    res.setHeader("Content-Type", "text/html; charset=utf-8");
     if (!sp.success) {
         res.end(JSON.stringify({
             "spotify": sp.message
