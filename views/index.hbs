@@ -28,7 +28,7 @@
                 Xiami(请回到旧版,登陆后上面的menu就有这个选择,然后在选择我的音乐，的第二页的链接) </font>
         </p>
 
-        <form action="/xiami" onsubmit="xiamiButton.disabled = true; return xiamiValidation()" method="post">
+        <form action="/xiami" onsubmit="return xiamiValidation();" method="post">
             <input id="xiamiUrl" type="input" name="playlistUrl" size="40"
                 placeholder="虾米音乐我的音乐第二页的链接/Url for Second Page of Xiami playListUrl" required>
             <input type="hidden" name="spotifyAccessToken" value={{accessToken}}>
@@ -51,7 +51,7 @@
     <p>NetEaseCloudMusic user , please use this one,go to the playlist you want to transfer, copy the url
     </p>
     <div>
-        <form action="/netEaseCloudMusic" onsubmit="netEaseButton.disabled = true; neteaseValidation()" method="post">
+        <form action="/netEaseCloudMusic" onsubmit="return neteaseValidation();" method="post">
             <input id="neteaseUrl" type="input" name="playlistUrl" size="40" placeholder="netEaseCloudMusic PlayListUrl"
                 required>
             <input type="hidden" name="spotifyAccessToken" value={{accessToken}}>
