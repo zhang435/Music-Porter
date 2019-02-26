@@ -2,6 +2,16 @@
 <html lang="en-US">
 
 <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135177421-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-135177421-1');
+    </script>
+
     <meta charset="UTF-8">
     <title>Xiami / NetEaseCLoudMusic to Spotify</title>
     <script src="/js/validation.js"></script>
@@ -18,11 +28,11 @@
                 Xiami(请回到旧版,登陆后上面的menu就有这个选择,然后在选择我的音乐，的第二页的链接) </font>
         </p>
 
-        <form action="/xiami" onsubmit="return xiamiValidation()" method="post">
-            <input id="xiamiUrl" type="input" name="playlistUrl" size="40" placeholder="虾米音乐我的音乐第二页的链接/Url for Second Page of Xiami playListUrl"
-                required>
+        <form action="/xiami" onsubmit="return xiamiValidation();" method="post">
+            <input id="xiamiUrl" type="input" name="playlistUrl" size="40"
+                placeholder="虾米音乐我的音乐第二页的链接/Url for Second Page of Xiami playListUrl" required>
             <input type="hidden" name="spotifyAccessToken" value={{accessToken}}>
-            <input type="submit" value="Submit">
+            <input name="xiamiButton" type="submit" value="Submit">
         </form>
     </div>
     <div>
@@ -31,7 +41,8 @@
         </p>
 
         <p>
-            <font size="1">https://www.xiami.com/space/lib-song/u/18313828/page/2?spm=a1z1s.6928797.1561534521.342.HmvvYd
+            <font size="1">
+                https://www.xiami.com/space/lib-song/u/18313828/page/2?spm=a1z1s.6928797.1561534521.342.HmvvYd
             </font>
         </p>
 
@@ -40,11 +51,11 @@
     <p>NetEaseCloudMusic user , please use this one,go to the playlist you want to transfer, copy the url
     </p>
     <div>
-        <form action="/netEaseCloudMusic" onsubmit="return neteaseValidation()" method="post">
+        <form action="/netEaseCloudMusic" onsubmit="return neteaseValidation();" method="post">
             <input id="neteaseUrl" type="input" name="playlistUrl" size="40" placeholder="netEaseCloudMusic PlayListUrl"
                 required>
             <input type="hidden" name="spotifyAccessToken" value={{accessToken}}>
-            <input type="submit" value="Submit">
+            <input name="netEaseButton" type="submit" value="Submit">
         </form>
     </div>
     <div>
