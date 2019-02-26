@@ -51,7 +51,7 @@
     <p>NetEaseCloudMusic user , please use this one,go to the playlist you want to transfer, copy the url
     </p>
     <div>
-        <form action="/netEaseCloudMusic" onsubmit="return neteaseValidation();" method="post">
+        <form action="/netEaseCloudMusic" onsubmit="return neteaseValidation()" method="post">
             <input id="neteaseUrl" type="input" name="playlistUrl" size="40" placeholder="netEaseCloudMusic PlayListUrl"
                 required>
             <input type="hidden" name="spotifyAccessToken" value={{accessToken}}>

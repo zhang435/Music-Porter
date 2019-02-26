@@ -20,7 +20,7 @@ function fetch_page(link) {
             .end((err, res) => {
                 if (err)
                     reject({
-
+                        "WTF": "!!!!!!",
                         err
                     });
 
@@ -53,7 +53,7 @@ async function get_song_profile(link) {
             profiles.push($(element).attr("href"));
         })
         resolve(profiles);
-        rej("_");
+        rej("error in get_song_profile");
     })
 }
 
@@ -75,6 +75,7 @@ async function getSongSingerFromProfilePage(link) {
                 var song = $("em.f-ff2").text();
                 var singer = $("span").children(".s-fc7").text();
                 resolve(new Array(song, singer));
+                reject("error in getSongSingerFromProfilePage");
             })
     })
 }
@@ -86,15 +87,14 @@ async function getSongSingerFromProfilePage(link) {
  */
 async function generateSongSingers(link, sp, res) {
     link = link.replace("/#/", "/");
-    var profiles = await get_song_profile(link).catch(error => console.log(error));
+    var profiles = await get_song_profile(link).catch(error => res.write(JSON.stringify(error) + "1"));
     var songArtists = new Array();
-    res.write("<h1>Fetching songs from NetEaseMusic: " + link + " : </h1>" + "\n");
     for (var i = 0; i < profiles.length; i++) {
-        var song_singer = await getSongSingerFromProfilePage(profiles[i]).catch(err => console.log(err));
+        var song_singer = await getSongSingerFromProfilePage(profiles[i]).catch(error => res.write(JSON.stringify(error) + "2"));
         console.log(song_singer);
         songArtists.push(song_singer);
         if (songArtists.length == 20 || (i == profiles.length - 1)) {
-            var uris = await sp.getSongsURI(songArtists).catch(err => err);
+            var uris = await sp.getSongsURI(songArtists).catch(error => res.write(JSON.stringify(error) + "3"));
             if (uris.success) {
                 res.write(JSON.stringify(uris) + "<br>");
             } else {
@@ -105,7 +105,7 @@ async function generateSongSingers(link, sp, res) {
             sp.addSongsToPlaylist(uris.val.uris).then((result) => {
                 // res.write(JSON.stringify(result) + "\n");
             }).catch((err) => {
-                res.write(JSON.stringify(err.message));
+                res.write(JSON.stringify(err));
                 return;
             });
             songArtists = new Array();
@@ -126,7 +126,7 @@ async function generateSongSingers(link, sp, res) {
 }
 
 
-// generateSongSingers();
+// // generateSongSingers();
 // var netEaselink1 = "https://music.163.com/playlist?id=501341874";
 // var netEaselink2 = "https://music.163.com/playlist?id=11879687";
 // var netEaselink3 = "https://music.163.com/#/playlist?id=2542915771";

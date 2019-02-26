@@ -99,7 +99,7 @@ app.post("/NetEaseCloudMusic", (req, res) => {
 
     // record the user playlist url for debugging purpose
     db.insert(db.NETEASE_TABLENAME, NetEaseCloudMusicUrl);
-    res.write("<h1>start import netease playlist to spotify</h1>");
+    res.write("<h1>start import netease playlist to spotify " + NetEaseCloudMusicUrl + "</h1>");
     NetEaseProcess(spotifyAccessToken, NetEaseCloudMusicUrl, res);
 })
 
@@ -177,7 +177,7 @@ async function NetEaseProcess(spotifyAccessToken, NetEaseCloudMusicUrl, res) {
         sp = sp.val;
     }
 
-    var songArtists = await NetEase.generateSongSingers(NetEaseCloudMusicUrl, sp, res).catch(err => res.write(err));
+    var songArtists = await NetEase.generateSongSingers(NetEaseCloudMusicUrl, sp, res).catch(err => res.write(JSON.stringify(err)));
     console.debug("got all songs from NetEase");
     res.end("<h1> done,check 'from NetEase' in Spotify</h1>");
 }
