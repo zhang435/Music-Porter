@@ -14,7 +14,7 @@ function xiamiValidation() {
 
 function neteaseValidation() {
     var url = document.getElementById("neteaseUrl").value;
-    var reg = /^https:\/\/music.163.com\/#\/playlist\?id=\d+$/g;
+    var reg = /^https:\/\/music.163.com\/#\/playlist\?id=\d+(&userid=\d+)?$/g;
 
 
     if (url.match(reg) == null) {
@@ -23,11 +23,24 @@ function neteaseValidation() {
     };
     return true;
 }
-// var url = "https://www.xiami.com/space/lib-song/u/32935150/page/2?spm=a1z1s.6928797.1561534521.347.5oNhml"
-// var reg = /^https:\/\/www.xiami.com\/space\/lib-song\/u\/\d+\/page\/\d\?spm=\S+$/g;
-// console.log(url.match(reg))
+
+function test() {
+    var url = "https://www.xiami.com/space/lib-song/u/32935150/page/2?spm=a1z1s.6928797.1561534521.347.5oNhml"
+    var reg = /^https:\/\/www.xiami.com\/space\/lib-song\/u\/\d+\/page\/\d\?spm=\S+$/g;
+    console.log(url.match(reg) != null)
 
 
-// url = "https://music.163.com/#/playlist?id=501341874"
-// var reg = /^https:\/\/music.163.com\/#\/playlist\?id=\d+$/g;
-// console.log(url.match(reg))
+    url = "https://music.163.com/#/playlist?id=501341874"
+    var reg = /^https:\/\/music.163.com\/#\/playlist\?id=\d+(&userid=\d+)?$/g;
+    console.log(url.match(reg) != null)
+
+    url = "https://music.163.com/#/playlist?id=37560357&userid=43051609"
+    var reg = /^https:\/\/music.163.com\/#\/playlist\?id=\d+(&userid=\d+)?$/g;
+    console.log(url.match(reg) != null)
+
+    url = "https://music.163.com/#/playlist?id=37560357&userid=43051609&sdf"
+    var reg = /^https:\/\/music.163.com\/#\/playlist\?id=\d+(&userid=\d+)?$/g;
+    console.log(url.match(reg) != null)
+}
+
+// test()
