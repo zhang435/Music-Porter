@@ -4,7 +4,7 @@ function xiamiValidation() {
      */
 
     var url = document.getElementById("xiamiUrl").value;
-    var reg = /https:\/\/(www)?(emumo)?.xiami.com\/space\/lib-song\/u\/\d+\/page\/\d\?spm=\S+$/g;
+    var reg = /^https:\/\/(www)?(emumo)?.xiami.com\/space\/lib-song\/u\/\d+\/page\/2(\S+)?$/g;
     if (url.match(reg) == null) {
         alert("Invalid url, it has to be the url of second page of your playlist");
         return false;
