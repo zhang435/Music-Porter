@@ -13,8 +13,10 @@ function xiamiValidation() {
 }
 
 function neteaseValidation() {
+
+
     var url = document.getElementById("neteaseUrl").value;
-    var reg = /^https:\/\/music.163.com\/#\/playlist\?id=\d+(&userid=\d+)?$/g;
+    var reg = /^(https?|chrome):\/\/music.163.com[^\s$.?#].[^\s]*$/gm;
 
 
     if (url.match(reg) == null) {
@@ -33,13 +35,16 @@ function test() {
 
 
     url = "https://music.163.com/#/playlist?id=501341874"
-    var reg = /^https:\/\/music.163.com\/#\/playlist\?id=\d+(&userid=\d+)?$/g;
+    reg = /^(https?|chrome):\/\/music.163.com[^\s$.?#].[^\s]*$/gm
     console.log(url.match(reg) != null)
 
     url = "https://music.163.com/#/playlist?id=37560357&userid=43051609"
     console.log(url.match(reg) != null)
 
     url = "https://music.163.com/#/playlist?id=37560357&userid=43051609&sdf"
+    console.log(url.match(reg) != null)
+
+    url = "asd"
     console.log(url.match(reg) == null)
 }
 
