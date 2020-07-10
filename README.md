@@ -1,3 +1,5 @@
+# Xiami & Netease update their frontend and parser is not working. Close this project. 
+
 # Music Porter
 
 ### From Xiami/NetEaseCloudMusic to Spotify implemented with Node.js
